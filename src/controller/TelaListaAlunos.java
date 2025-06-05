@@ -4,45 +4,38 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
+import java.util.Vector;
 
 public class TelaListaAlunos extends JPanel {
-    private static final String CPF = null;
-    private JTable tabela;
-    private DefaultTableModel modelo;
 
     public TelaListaAlunos() {
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 245, 245));
 
-        modelo = new DefaultTableModel(new String[]{"Nome", "CPF", "Nascimento", "Matrícula"}, 0);
+        String[] colunas = {
+            "Nome", "CPF", "Nascimento", "Sexo",
+            "E-mail", "Telefone", "Endereço",
+            "Curso", "Grau", "Turno", "Ingresso", "Situação"
+        };
 
-        tabela = new JTable(modelo);
-        tabela.setFillsViewportHeight(true);
+        DefaultTableModel model = new DefaultTableModel(colunas, 0);
 
-        JScrollPane scrollPane = new JScrollPane(tabela);
-        add(scrollPane, BorderLayout.CENTER);
-
-        carregarDados();
-    }
-
-    private void carregarDados() {
-        modelo.setRowCount(0); // limpa a tabela antes de carregar
-
-        File arquivo = new File("alunos.txt");
-        if (!arquivo.exists()) {
-            return;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+        // Ler arquivo e preencher tabela
+        try (BufferedReader reader = new BufferedReader(new FileReader("alunos.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
-                if (dados.length == 4) {
-                    modelo.addRow(dados);
+                Vector<String> row = new Vector<>();
+                for (String dado : dados) {
+                    row.add(dado);
                 }
+                model.addRow(row);
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao carregar alunos!", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erro ao ler alunos.txt", "Erro", JOptionPane.ERROR_MESSAGE);
         }
+
+        JTable tabela = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(tabela);
+        add(scrollPane, BorderLayout.CENTER);
     }
 }

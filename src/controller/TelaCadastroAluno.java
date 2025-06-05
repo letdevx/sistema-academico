@@ -1,99 +1,178 @@
 package controller;
 
-import model.Aluno;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class TelaCadastroAluno extends JPanel {
-    private JTextField nomeField, cpfField, dataNascField, matriculaField;
-    private ArrayList<Aluno> listaAlunos = new ArrayList<>();
+
+    private JTextField campoNome;
+    private JTextField campoCpf;
+    private JTextField campoNascimento;
+    private JComboBox<String> comboSexo;
+
+    private JTextField campoEmail;
+    private JTextField campoTelefone;
+    private JTextField campoEndereco;
+
+    private JComboBox<String> comboCurso;
+    private JComboBox<String> comboGrau;
+    private JComboBox<String> comboTurno;
+    private JTextField campoIngresso;
+    private JComboBox<String> comboSituacao;
 
     public TelaCadastroAluno() {
         setLayout(new BorderLayout());
-        setBackground(new Color(240, 248, 255));
+        setBackground(Color.WHITE);
 
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
-        formPanel.setBackground(new Color(240, 248, 255));
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createTitledBorder("Cadastro de Aluno - Universidade"));
+        formPanel.setBackground(new Color(245, 255, 250));
 
-        nomeField = criarCampo("Nome:", formPanel);
-        cpfField = criarCampo("CPF:", formPanel);
-        dataNascField = criarCampo("Data de Nascimento:", formPanel);
-        matriculaField = criarCampo("Matrícula:", formPanel);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
-        JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton salvarButton = new JButton("Salvar");
-        JButton limparButton = new JButton("Limpar");
-        botoesPanel.add(salvarButton);
-        botoesPanel.add(limparButton);
-        botoesPanel.setOpaque(false);
+        // Campos
+        formPanel.add(new JLabel("Nome completo:"), gbc);
+        gbc.gridx = 1;
+        campoNome = new JTextField(20);
+        formPanel.add(campoNome, gbc);
 
-        salvarButton.addActionListener(e -> salvarAluno());
-        limparButton.addActionListener(e -> limparCampos());
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("CPF:"), gbc);
+        gbc.gridx = 1;
+        campoCpf = new JTextField(15);
+        formPanel.add(campoCpf, gbc);
 
-        formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        formPanel.add(botoesPanel);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Data de nascimento:"), gbc);
+        gbc.gridx = 1;
+        campoNascimento = new JTextField(10);
+        formPanel.add(campoNascimento, gbc);
 
-        JPanel topo = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        topo.add(formPanel);
-        topo.setOpaque(false);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Sexo:"), gbc);
+        gbc.gridx = 1;
+        comboSexo = new JComboBox<>(new String[]{"Masculino", "Feminino", "Outro", "Prefere não dizer"});
+        formPanel.add(comboSexo, gbc);
 
-        add(topo, BorderLayout.NORTH);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("E-mail pessoal:"), gbc);
+        gbc.gridx = 1;
+        campoEmail = new JTextField(20);
+        formPanel.add(campoEmail, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Telefone celular:"), gbc);
+        gbc.gridx = 1;
+        campoTelefone = new JTextField(15);
+        formPanel.add(campoTelefone, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Endereço completo:"), gbc);
+        gbc.gridx = 1;
+        campoEndereco = new JTextField(30);
+        formPanel.add(campoEndereco, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Curso:"), gbc);
+        gbc.gridx = 1;
+        comboCurso = new JComboBox<>(new String[]{"Engenharia", "Direito", "Medicina", "Administração"});
+        formPanel.add(comboCurso, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Grau:"), gbc);
+        gbc.gridx = 1;
+        comboGrau = new JComboBox<>(new String[]{"Bacharelado", "Licenciatura", "Tecnólogo"});
+        formPanel.add(comboGrau, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Turno:"), gbc);
+        gbc.gridx = 1;
+        comboTurno = new JComboBox<>(new String[]{"Matutino", "Vespertino", "Noturno"});
+        formPanel.add(comboTurno, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Data de ingresso:"), gbc);
+        gbc.gridx = 1;
+        campoIngresso = new JTextField(10);
+        formPanel.add(campoIngresso, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        formPanel.add(new JLabel("Situação:"), gbc);
+        gbc.gridx = 1;
+        comboSituacao = new JComboBox<>(new String[]{"Ativo", "Trancado", "Desligado", "Formado"});
+        formPanel.add(comboSituacao, gbc);
+
+        // Botões
+        gbc.gridx = 0;
+        gbc.gridy++;
+        JButton salvar = new JButton("Salvar");
+        salvar.addActionListener(this::salvarDados);
+        formPanel.add(salvar, gbc);
+
+        gbc.gridx = 1;
+        JButton limpar = new JButton("Limpar");
+        limpar.addActionListener(e -> limparCampos());
+        formPanel.add(limpar, gbc);
+
+        add(formPanel, BorderLayout.NORTH);
     }
 
-    private JTextField criarCampo(String label, JPanel container) {
-        JPanel linha = new JPanel();
-        linha.setLayout(new BoxLayout(linha, BoxLayout.Y_AXIS));
-        linha.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        linha.setBackground(new Color(240, 248, 255));
-
-        JLabel lbl = new JLabel(label);
-        JTextField campo = new JTextField();
-        campo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        campo.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        linha.add(lbl);
-        linha.add(campo);
-        container.add(linha);
-
-        return campo;
-    }
-
-    private void salvarAluno() {
-        String nome = nomeField.getText().trim();
-        String cpf = cpfField.getText().trim();
-        String nascimento = dataNascField.getText().trim();
-        String matricula = matriculaField.getText().trim();
-
-        if (nome.isEmpty() || cpf.isEmpty() || nascimento.isEmpty() || matricula.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Todos os campos são obrigatórios!", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Aluno aluno = new Aluno(nome, cpf, nascimento, matricula);
-        listaAlunos.add(aluno);
-
+    private void salvarDados(ActionEvent e) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("alunos.txt", true))) {
-            writer.write(nome + ";" + cpf + ";" + nascimento + ";" + matricula);
+            writer.write(
+                campoNome.getText() + ";" +
+                campoCpf.getText() + ";" +
+                campoNascimento.getText() + ";" +
+                comboSexo.getSelectedItem() + ";" +
+                campoEmail.getText() + ";" +
+                campoTelefone.getText() + ";" +
+                campoEndereco.getText() + ";" +
+                comboCurso.getSelectedItem() + ";" +
+                comboGrau.getSelectedItem() + ";" +
+                comboTurno.getSelectedItem() + ";" +
+                campoIngresso.getText() + ";" +
+                comboSituacao.getSelectedItem()
+            );
             writer.newLine();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar no arquivo!", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
+            JOptionPane.showMessageDialog(this, "Aluno salvo com sucesso!");
+            limparCampos();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar aluno!", "Erro", JOptionPane.ERROR_MESSAGE);
         }
-
-        JOptionPane.showMessageDialog(this, "Aluno salvo com sucesso!");
-        limparCampos();
     }
 
     private void limparCampos() {
-        nomeField.setText("");
-        cpfField.setText("");
-        dataNascField.setText("");
-        matriculaField.setText("");
+        campoNome.setText("");
+        campoCpf.setText("");
+        campoNascimento.setText("");
+        comboSexo.setSelectedIndex(0);
+        campoEmail.setText("");
+        campoTelefone.setText("");
+        campoEndereco.setText("");
+        comboCurso.setSelectedIndex(0);
+        comboGrau.setSelectedIndex(0);
+        comboTurno.setSelectedIndex(0);
+        campoIngresso.setText("");
+        comboSituacao.setSelectedIndex(0);
     }
 }
