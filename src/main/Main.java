@@ -1,87 +1,75 @@
 package main;
 
 import controller.TelaCadastroAluno;
+import controller.TelaCadastroProfessor;
 import controller.TelaListaAlunos;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class Main {
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Sistema Acadêmico");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            JFrame janela = new JFrame("Sistema Acadêmico Universitário");
+            janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            janela.setSize(1000, 600);
+            janela.setLocationRelativeTo(null);
 
-            // Painéis de conteúdo (telas)
-            JPanel contentPanel = new JPanel(new CardLayout());
-            TelaCadastroAluno cadastroAluno = new TelaCadastroAluno();
-            TelaListaAlunos listaAlunos = new TelaListaAlunos();
-            JPanel telaTurmas = new JPanel(); telaTurmas.add(new JLabel("Cadastro de Turmas"));
-            JPanel telaProfessores = new JPanel(); telaProfessores.add(new JLabel("Cadastro de Professores"));
+            JPanel painelPrincipal = new JPanel(new BorderLayout());
 
-            contentPanel.add(cadastroAluno, "aluno");
-            contentPanel.add(telaTurmas, "turmas");
-            contentPanel.add(telaProfessores, "professores");
-            contentPanel.add(listaAlunos, "lista");
+            // Sidebar moderna
+            JPanel menuLateral = new JPanel();
+            menuLateral.setLayout(new GridLayout(0, 1, 10, 10));
+            menuLateral.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
+            menuLateral.setBackground(new Color(33, 37, 41)); // cor escura tipo Bootstrap
 
-            // Menu lateral estilo Bootstrap
-            JPanel menuPanel = new JPanel();
-            menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
-            menuPanel.setBackground(new Color(33, 37, 41));
+            Font fonteMenu = new Font("Segoe UI", Font.BOLD, 14);
+            Color corTexto = Color.WHITE;
 
-            String[] opcoes = {
-                "Cadastro de Aluno", 
-                "Cadastro de Turmas", 
-                "Cadastro de Professores", 
-                "Lista de Alunos", 
-                "Sair"
-            };
+            JButton btnCadastroAluno = new JButton("Cadastrar Aluno");
+            JButton btnCadastroProfessor = new JButton("Cadastrar Professor");
+            JButton btnListaAlunos = new JButton("Lista de Alunos");
 
-            for (String nome : opcoes) {
-                JButton botao = new JButton(nome);
-                botao.setAlignmentX(Component.CENTER_ALIGNMENT);
-                botao.setMaximumSize(new Dimension(180, 40));
-                botao.setForeground(Color.WHITE);
-                botao.setBackground(new Color(52, 58, 64));
-                botao.setFocusPainted(false);
-                botao.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-                botao.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            JButton[] botoes = { btnCadastroAluno, btnCadastroProfessor, btnListaAlunos };
 
-                switch (nome) {
-                    case "Cadastro de Aluno":
-                        botao.addActionListener(e -> ((CardLayout) contentPanel.getLayout()).show(contentPanel, "aluno"));
-                        break;
-                    case "Cadastro de Turmas":
-                        botao.addActionListener(e -> ((CardLayout) contentPanel.getLayout()).show(contentPanel, "turmas"));
-                        break;
-                    case "Cadastro de Professores":
-                        botao.addActionListener(e -> ((CardLayout) contentPanel.getLayout()).show(contentPanel, "professores"));
-                        break;
-                    case "Lista de Alunos":
-                        botao.addActionListener(e -> {
-                            // Recarrega a lista sempre que for exibida
-                            contentPanel.remove(listaAlunos);
-                            TelaListaAlunos novaLista = new TelaListaAlunos();
-                            contentPanel.add(novaLista, "lista");
-                            ((CardLayout) contentPanel.getLayout()).show(contentPanel, "lista");
-                        });
-                        break;
-                    case "Sair":
-                        botao.addActionListener(e -> System.exit(0));
-                        break;
-                }
-
-                menuPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-                menuPanel.add(botao);
+            for (JButton btn : botoes) {
+                btn.setFocusPainted(false);
+                btn.setBackground(new Color(52, 58, 64)); // estilo btn-dark
+                btn.setForeground(corTexto);
+                btn.setFont(fonteMenu);
+                btn.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+                menuLateral.add(btn);
             }
 
-            menuPanel.setPreferredSize(new Dimension(220, frame.getHeight()));
+            JPanel painelConteudo = new JPanel(new BorderLayout());
 
-            frame.setLayout(new BorderLayout());
-            frame.add(menuPanel, BorderLayout.WEST);
-            frame.add(contentPanel, BorderLayout.CENTER);
+            btnCadastroAluno.addActionListener(e -> {
+                painelConteudo.removeAll();
+                painelConteudo.add(new TelaCadastroAluno(), BorderLayout.CENTER);
+                painelConteudo.revalidate();
+                painelConteudo.repaint();
+            });
 
-            frame.setVisible(true);
+            btnCadastroProfessor.addActionListener(e -> {
+                painelConteudo.removeAll();
+                painelConteudo.add(new TelaCadastroProfessor(), BorderLayout.CENTER);
+                painelConteudo.revalidate();
+                painelConteudo.repaint();
+            });
+
+            btnListaAlunos.addActionListener(e -> {
+                painelConteudo.removeAll();
+                painelConteudo.add(new TelaListaAlunos(), BorderLayout.CENTER);
+                painelConteudo.revalidate();
+                painelConteudo.repaint();
+            });
+
+            painelPrincipal.add(menuLateral, BorderLayout.WEST);
+            painelPrincipal.add(painelConteudo, BorderLayout.CENTER);
+
+            janela.add(painelPrincipal);
+            janela.setVisible(true);
         });
     }
 }
