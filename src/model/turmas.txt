@@ -1,0 +1,2 @@
+5 ano engenharia;Engenharia;Manhã;
+1 ano medicina;Medicina;Manhã;2 semestre

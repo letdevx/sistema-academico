@@ -1,0 +1,8 @@
+Anatomia
+Biologia
+Fisiologia
+Farmacologia
+Patologia
+Imunologia
+Histologia
+Bioquímica

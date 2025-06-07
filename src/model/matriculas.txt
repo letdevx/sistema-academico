@@ -1,0 +1,3 @@
+12345678900;1 ano medicina
+98765432100;2 ano medicina
+55566677700;3 ano medicina
