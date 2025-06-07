@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "sistema_academico",
+			"path": ".."
+		},
+		{
+			"name": "javafx-sdk-24.0.1",
+			"path": "../../../Downloads/javafx-sdk-24.0.1"
+		}
+	],
+	"settings": {}
+}

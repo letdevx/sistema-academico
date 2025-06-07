@@ -1,4 +1,3 @@
-
 package main;
 
 import javax.swing.*;
@@ -66,12 +65,21 @@ public class Main {
             contentPanel.repaint();
         });
 
+        JButton btnBoletim = new JButton("Boletim");
+        btnBoletim.addActionListener(e -> {
+            contentPanel.removeAll();
+            contentPanel.add(new TelaBoletimAluno(), BorderLayout.CENTER);
+            contentPanel.revalidate();
+            contentPanel.repaint();
+        });
+
         menuPanel.add(btnAlunos);
         menuPanel.add(btnProfessores);
         menuPanel.add(btnTurmas);
         menuPanel.add(btnDisciplinas);
         menuPanel.add(btnMatriculas);
         menuPanel.add(btnNotas);
+        menuPanel.add(btnBoletim);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, menuPanel, contentPanel);
         splitPane.setDividerLocation(200);
