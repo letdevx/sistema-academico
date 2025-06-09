@@ -3,10 +3,6 @@ package controller;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Tela de Login com divisão ao meio, Singleton, Template Method
- * Imagem à esquerda, campos à direita
- */
 public class TelaLogin extends LoginTemplate {
 
     private static TelaLogin instancia;
@@ -21,50 +17,67 @@ public class TelaLogin extends LoginTemplate {
     private TelaLogin() {
         super("Login - Sistema Acadêmico");
 
-        // --- Painel com imagem à esquerda ---
+        // Painel da imagem (lado esquerdo)
         JLabel imagemLabel = new JLabel();
         imagemLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // Carrega e redimensiona a imagem
-        ImageIcon originalIcon = new ImageIcon("/Users/letdevx/Documents/sistema_academico/sistema-academico/src/logo.png"); // troque pelo caminho correto
-        Image imagemRedimensionada = originalIcon.getImage().getScaledInstance(400, 600, Image.SCALE_SMOOTH);
-        imagemLabel.setIcon(new ImageIcon(imagemRedimensionada));
-
+        ImageIcon originalIcon = new ImageIcon("imagem_login.png"); // ajuste o nome do arquivo conforme sua imagem
+        Image imagem = originalIcon.getImage().getScaledInstance(500, 600, Image.SCALE_SMOOTH);
+        imagemLabel.setIcon(new ImageIcon(imagem));
         JPanel painelImagem = new JPanel(new BorderLayout());
         painelImagem.add(imagemLabel, BorderLayout.CENTER);
 
-        // --- Painel de login à direita ---
+        // Painel de login (lado direito)
         JPanel painelLogin = new JPanel(new GridBagLayout());
-        painelLogin.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        painelLogin.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(12, 12, 12, 12);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel labelUsuario = new JLabel("Usuário:");
-        JLabel labelSenha = new JLabel("Senha:");
-        campoUsuario = new JTextField(15);
-        campoSenha = new JPasswordField(15);
-        JButton btnEntrar = new JButton("Entrar");
+        JLabel logo = new JLabel("<html><center><h1 style='color:#003366;'>SISTEMA<br>ACADÊMICO</h1><p>TECHNOVA UNIVERSITY</p></center></html>", SwingConstants.CENTER);
+        logo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
+        campoUsuario = new JTextField(16);
+        campoSenha = new JPasswordField(16);
+        JButton btnEntrar = new JButton("LOGIN");
+        btnEntrar.setBackground(new Color(0, 120, 215));
+        btnEntrar.setForeground(Color.WHITE);
+        btnEntrar.setFocusPainted(false);
+        btnEntrar.setFont(new Font("Arial", Font.BOLD, 14));
         btnEntrar.addActionListener(e -> autenticar());
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        painelLogin.add(labelUsuario, gbc);
+        JLabel lblUsuario = new JLabel("Usuário:");
+        JLabel lblSenha = new JLabel("Senha:");
+        JLabel esqueciSenha = new JLabel("Esqueceu a senha?");
+        esqueciSenha.setHorizontalAlignment(SwingConstants.CENTER);
+        esqueciSenha.setForeground(Color.GRAY);
+
+        // Layout dos componentes
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        painelLogin.add(logo, gbc);
+
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        painelLogin.add(lblUsuario, gbc);
         gbc.gridx = 1;
         painelLogin.add(campoUsuario, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        painelLogin.add(labelSenha, gbc);
+        gbc.gridx = 0; gbc.gridy++;
+        painelLogin.add(lblSenha, gbc);
         gbc.gridx = 1;
         painelLogin.add(campoSenha, gbc);
 
-        gbc.gridx = 1; gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridx = 0; gbc.gridy++; gbc.gridwidth = 2;
         painelLogin.add(btnEntrar, gbc);
 
-        // --- Divide a tela ---
+        gbc.gridy++;
+        painelLogin.add(esqueciSenha, gbc);
+
+        // Divide a tela com a imagem à esquerda e login à direita
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, painelImagem, painelLogin);
-        split.setDividerLocation(400);
+        split.setDividerLocation(500);
+        split.setDividerSize(0);
+        split.setEnabled(false);
+
         add(split);
     }
 
