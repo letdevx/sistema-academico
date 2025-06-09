@@ -73,6 +73,13 @@ public class Main {
             contentPanel.repaint();
         });
 
+        // ➕ Botão de logout
+        JButton btnLogout = new JButton("Sair");
+        btnLogout.addActionListener(e -> {
+            frame.dispose(); // Fecha a janela principal
+            TelaLogin.getInstancia().setVisible(true); // Retorna para a tela de login
+        });
+
         menuPanel.add(btnAlunos);
         menuPanel.add(btnProfessores);
         menuPanel.add(btnTurmas);
@@ -80,6 +87,7 @@ public class Main {
         menuPanel.add(btnMatriculas);
         menuPanel.add(btnNotas);
         menuPanel.add(btnBoletim);
+        menuPanel.add(btnLogout); // ← Adicionado ao final
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, menuPanel, contentPanel);
         splitPane.setDividerLocation(200);

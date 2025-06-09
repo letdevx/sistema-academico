@@ -2,6 +2,7 @@ package controller;
 
 import javax.swing.*;
 import java.awt.*;
+import main.Main;
 
 public class TelaLogin extends LoginTemplate {
 
@@ -20,13 +21,16 @@ public class TelaLogin extends LoginTemplate {
         // Painel da imagem (lado esquerdo)
         JLabel imagemLabel = new JLabel();
         imagemLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon originalIcon = new ImageIcon("imagem_login.png"); // ajuste o nome do arquivo conforme sua imagem
-        Image imagem = originalIcon.getImage().getScaledInstance(500, 600, Image.SCALE_SMOOTH);
-        imagemLabel.setIcon(new ImageIcon(imagem));
+
+        // Carrega e redimensiona a imagem
+        ImageIcon imagemOriginal = new ImageIcon("login_image.png"); // <- nome do arquivo da imagem
+        Image imagemRedimensionada = imagemOriginal.getImage().getScaledInstance(500, 600, Image.SCALE_SMOOTH);
+        imagemLabel.setIcon(new ImageIcon(imagemRedimensionada));
+
         JPanel painelImagem = new JPanel(new BorderLayout());
         painelImagem.add(imagemLabel, BorderLayout.CENTER);
 
-        // Painel de login (lado direito)
+        // Painel do formulário de login (lado direito)
         JPanel painelLogin = new JPanel(new GridBagLayout());
         painelLogin.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -38,12 +42,17 @@ public class TelaLogin extends LoginTemplate {
 
         campoUsuario = new JTextField(16);
         campoSenha = new JPasswordField(16);
-        JButton btnEntrar = new JButton("LOGIN");
-        btnEntrar.setBackground(new Color(0, 120, 215));
+        JButton btnEntrar = new JButton("ENTRAR");
+        btnEntrar.setBackground(new Color(0, 123, 255)); // cor azul Bootstrap
         btnEntrar.setForeground(Color.WHITE);
+        btnEntrar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnEntrar.setFocusPainted(false);
-        btnEntrar.setFont(new Font("Arial", Font.BOLD, 14));
+        btnEntrar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // padding
+        btnEntrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnEntrar.setOpaque(true);
+        btnEntrar.setBorderPainted(false);
         btnEntrar.addActionListener(e -> autenticar());
+
 
         JLabel lblUsuario = new JLabel("Usuário:");
         JLabel lblSenha = new JLabel("Senha:");
@@ -51,12 +60,10 @@ public class TelaLogin extends LoginTemplate {
         esqueciSenha.setHorizontalAlignment(SwingConstants.CENTER);
         esqueciSenha.setForeground(Color.GRAY);
 
-        // Layout dos componentes
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         painelLogin.add(logo, gbc);
 
-        gbc.gridy++;
-        gbc.gridwidth = 1;
+        gbc.gridy++; gbc.gridwidth = 1;
         painelLogin.add(lblUsuario, gbc);
         gbc.gridx = 1;
         painelLogin.add(campoUsuario, gbc);
@@ -72,7 +79,7 @@ public class TelaLogin extends LoginTemplate {
         gbc.gridy++;
         painelLogin.add(esqueciSenha, gbc);
 
-        // Divide a tela com a imagem à esquerda e login à direita
+        // Divide a tela em imagem (esquerda) e login (direita)
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, painelImagem, painelLogin);
         split.setDividerLocation(500);
         split.setDividerSize(0);
