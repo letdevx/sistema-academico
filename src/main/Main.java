@@ -1,14 +1,22 @@
 package main;
 
 import javax.swing.*;
-import controller.*;
 import java.awt.*;
+
+import controller.TelaCadastroAluno;
+import controller.TelaCadastroProfessor;
+import controller.TelaCadastroTurma;
+import controller.TelaCadastroDisciplina;
+import controller.TelaMatriculaCompleta;
+import controller.TelaLancamentoNotas;
+import controller.TelaBoletimAluno;
+import controller.TelaLogin;
 
 public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Sistema Acadêmico");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 600);
+        frame.setSize(1000, 600);
         frame.setLocationRelativeTo(null);
 
         JPanel menuPanel = new JPanel();
@@ -17,15 +25,17 @@ public class Main {
 
         JPanel contentPanel = new JPanel(new BorderLayout());
 
-        JButton btnAlunos = new JButton("Alunos");
+        JButton btnAlunos = new JButton("Cadastro de Alunos");
         btnAlunos.addActionListener(e -> {
             contentPanel.removeAll();
-            contentPanel.add(new TelaCadastroAluno(), BorderLayout.CENTER);
+            contentPanel.add(TelaCadastroAluno.getInstancia(), BorderLayout.CENTER);
             contentPanel.revalidate();
             contentPanel.repaint();
         });
+        
+        
 
-        JButton btnProfessores = new JButton("Professores");
+        JButton btnProfessores = new JButton("Cadastro de Professores");
         btnProfessores.addActionListener(e -> {
             contentPanel.removeAll();
             contentPanel.add(new TelaCadastroProfessor(), BorderLayout.CENTER);
@@ -33,7 +43,7 @@ public class Main {
             contentPanel.repaint();
         });
 
-        JButton btnTurmas = new JButton("Turmas");
+        JButton btnTurmas = new JButton("Cadastro de Turmas");
         btnTurmas.addActionListener(e -> {
             contentPanel.removeAll();
             contentPanel.add(new TelaCadastroTurma(), BorderLayout.CENTER);
@@ -41,7 +51,7 @@ public class Main {
             contentPanel.repaint();
         });
 
-        JButton btnDisciplinas = new JButton("Disciplinas");
+        JButton btnDisciplinas = new JButton("Cadastro de Disciplinas");
         btnDisciplinas.addActionListener(e -> {
             contentPanel.removeAll();
             contentPanel.add(new TelaCadastroDisciplina(), BorderLayout.CENTER);
@@ -49,7 +59,7 @@ public class Main {
             contentPanel.repaint();
         });
 
-        JButton btnMatriculas = new JButton("Matrículas");
+        JButton btnMatriculas = new JButton("Matrícula");
         btnMatriculas.addActionListener(e -> {
             contentPanel.removeAll();
             contentPanel.add(new TelaMatriculaCompleta(), BorderLayout.CENTER);
@@ -65,7 +75,7 @@ public class Main {
             contentPanel.repaint();
         });
 
-        JButton btnBoletim = new JButton("Boletim");
+        JButton btnBoletim = new JButton("Boletim do Aluno");
         btnBoletim.addActionListener(e -> {
             contentPanel.removeAll();
             contentPanel.add(new TelaBoletimAluno(), BorderLayout.CENTER);
@@ -73,11 +83,10 @@ public class Main {
             contentPanel.repaint();
         });
 
-        // ➕ Botão de logout
         JButton btnLogout = new JButton("Sair");
         btnLogout.addActionListener(e -> {
-            frame.dispose(); // Fecha a janela principal
-            TelaLogin.getInstancia().setVisible(true); // Retorna para a tela de login
+            frame.dispose();
+            TelaLogin.getInstancia().setVisible(true);
         });
 
         menuPanel.add(btnAlunos);
@@ -87,7 +96,7 @@ public class Main {
         menuPanel.add(btnMatriculas);
         menuPanel.add(btnNotas);
         menuPanel.add(btnBoletim);
-        menuPanel.add(btnLogout); // ← Adicionado ao final
+        menuPanel.add(btnLogout);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, menuPanel, contentPanel);
         splitPane.setDividerLocation(200);
