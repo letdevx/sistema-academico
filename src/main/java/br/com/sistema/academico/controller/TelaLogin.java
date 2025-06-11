@@ -1,12 +1,30 @@
 package br.com.sistema.academico.controller;
 
-import javax.swing.*;
-import java.awt.*;
-import br.com.sistema.academico.Main;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import br.com.sistema.academico.service.LoginService;
 
 public class TelaLogin extends LoginTemplate {
 
     private static TelaLogin instancia;
+    private LoginService loginService = new LoginService();
 
     public static TelaLogin getInstancia() {
         if (instancia == null) {
@@ -90,6 +108,6 @@ public class TelaLogin extends LoginTemplate {
 
     @Override
     protected boolean validar(String usuario, String senha) {
-        return usuario.equals("admin") && senha.equals("123");
+        return loginService.autenticar(usuario, senha);
     }
 }
