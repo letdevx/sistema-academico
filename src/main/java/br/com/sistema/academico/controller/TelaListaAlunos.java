@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -31,9 +32,7 @@ public class TelaListaAlunos extends JPanel {
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
                 Vector<String> row = new Vector<>();
-                for (String dado : dados) {
-                    row.add(dado);
-                }
+                row.addAll(Arrays.asList(dados));
                 model.addRow(row);
             }
         } catch (IOException e) {

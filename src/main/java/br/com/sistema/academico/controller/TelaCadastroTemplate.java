@@ -1,7 +1,14 @@
 package br.com.sistema.academico.controller;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public abstract class TelaCadastroTemplate extends JPanel {
     protected final String titulo;
