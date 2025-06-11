@@ -1,6 +1,5 @@
 package br.com.sistema.academico.controller;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,15 +8,13 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import br.com.sistema.academico.service.DisciplinaService;
@@ -29,15 +26,15 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     private JTextField campoCurso;
     private JTextField campoTurno;
     private JTextField campoAnoSemestre;
-    private JList<String> listaDisciplinas;
-    private final DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Nome da Turma", "Curso", "Turno", "Ano/Semestre", "Disciplinas"}, 0);
+    private JComboBox<String> comboDisciplinas;
+    private DefaultTableModel tableModel;
 
     private final TurmaService turmaService = new TurmaService();
     private DisciplinaService disciplinaService;
 
     public TelaCadastroTurma() {
         super("Cadastro de Turma");
-        carregarTurmas();
+        // NÃO chamar carregarTurmas() aqui!
     }
 
     @Override
@@ -54,56 +51,72 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
         campoCurso = new JTextField(20);
         campoTurno = new JTextField(20);
         campoAnoSemestre = new JTextField(20);
+        comboDisciplinas = new JComboBox<>();
+        try {
+            List<String> disciplinas = disciplinaService.listarDisciplinas();
+            if (disciplinas.isEmpty()) {
+                comboDisciplinas.addItem("Nenhuma disciplina disponível");
+            } else {
+                for (String d : disciplinas) {
+                    comboDisciplinas.addItem(d);
+                }
+            }
+        } catch (IOException e) {
+            comboDisciplinas.addItem("Erro ao carregar disciplinas");
+        }
 
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         formPanel.add(new JLabel("Nome da Turma:"), gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(campoNomeTurma, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         formPanel.add(new JLabel("Curso:"), gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(campoCurso, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         formPanel.add(new JLabel("Turno:"), gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(campoTurno, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         formPanel.add(new JLabel("Ano/Semestre:"), gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(campoAnoSemestre, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         formPanel.add(new JLabel("Disciplinas:"), gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        formPanel.add(comboDisciplinas, gbc);
 
-        DefaultListModel<String> modeloDisciplinas = new DefaultListModel<>();
-        try {
-            List<String> disciplinas = disciplinaService.listarDisciplinas();
-            if (disciplinas.isEmpty()) {
-                modeloDisciplinas.addElement("Nenhuma disciplina disponível");
-            } else {
-                for (String d : disciplinas) {
-                    modeloDisciplinas.addElement(d);
-                }
-            }
-        } catch (IOException e) {
-            modeloDisciplinas.addElement("Erro ao carregar disciplinas");
-        }
-
-        listaDisciplinas = new JList<>(modeloDisciplinas);
-        listaDisciplinas.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        JScrollPane scroll = new JScrollPane(listaDisciplinas);
-        scroll.setPreferredSize(new Dimension(200, 80));
-        formPanel.add(scroll, gbc);
-
+        // Inicializa o tableModel aqui
+        tableModel = new DefaultTableModel(new Object[]{"Nome da Turma", "Curso", "Turno", "Ano/Semestre", "Disciplinas"}, 0);
         JTable table = new JTable(tableModel);
         JScrollPane tableScroll = new JScrollPane(table);
         gbc.gridx = 0;
@@ -112,6 +125,8 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
         formPanel.add(tableScroll, gbc);
+
+        carregarTurmas(); // Agora sim, tableModel já está pronto
 
         return formPanel;
     }
@@ -130,12 +145,12 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
         String curso = campoCurso.getText().trim();
         String turno = campoTurno.getText().trim();
         String anoSemestre = campoAnoSemestre.getText().trim();
-        List<String> disciplinasSelecionadas = listaDisciplinas.getSelectedValuesList();
+        String disciplinaSelecionada = (String) comboDisciplinas.getSelectedItem();
 
         try {
-            turmaService.validarCampos(nomeTurma, curso, turno, anoSemestre, disciplinasSelecionadas);
-            turmaService.salvarTurma(nomeTurma, curso, turno, anoSemestre, disciplinasSelecionadas);
-            tableModel.addRow(new Object[]{nomeTurma, curso, turno, anoSemestre, String.join(",", disciplinasSelecionadas)});
+            turmaService.validarCampos(nomeTurma, curso, turno, anoSemestre, List.of(disciplinaSelecionada));
+            turmaService.salvarTurma(nomeTurma, curso, turno, anoSemestre, List.of(disciplinaSelecionada));
+            tableModel.addRow(new Object[]{nomeTurma, curso, turno, anoSemestre, disciplinaSelecionada});
             limparCampos();
             mostrarMensagemSucesso("Turma salva com sucesso!");
         } catch (IllegalArgumentException e) {
@@ -167,6 +182,6 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
         campoCurso.setText("");
         campoTurno.setText("");
         campoAnoSemestre.setText("");
-        listaDisciplinas.clearSelection();
+        comboDisciplinas.setSelectedIndex(0);
     }
 }
