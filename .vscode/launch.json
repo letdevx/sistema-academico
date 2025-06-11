@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "br.com.sistema.academico.App",
+            "projectName": "sistema-academico",
+            "vmArgs": "-Dfile.encoding=UTF-8",
+            "classPaths": [
+                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/target/lib/*"
+            ],
+            "preLaunchTask": "mvn compile"
+        }
+    ]
+}
