@@ -26,7 +26,7 @@ public class TelaListaAlunos extends JPanel {
         DefaultTableModel model = new DefaultTableModel(colunas, 0);
 
         // Ler arquivo e preencher tabela
-        try (BufferedReader reader = new BufferedReader(new FileReader("alunos.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");

@@ -34,6 +34,8 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     private JList<String> listaDisciplinas;
     private DefaultTableModel tableModel;
 
+    private String arquivoTurmas = "src/main/resources/data/turmas.txt";
+
     public TelaCadastroTurma() {
         super("Cadastro de Turma");
         tableModel = new DefaultTableModel(new Object[]{"Nome da Turma", "Curso", "Turno", "Ano/Semestre", "Disciplinas"}, 0);
@@ -83,7 +85,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
         gbc.gridx = 1;
 
         DefaultListModel<String> modeloDisciplinas = new DefaultListModel<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("disciplinas.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/data/disciplinas.txt"))) {
             String linha;
             while ((linha = br.readLine()) != null) {
                 modeloDisciplinas.addElement(linha);
@@ -131,7 +133,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
             return;
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("turmas.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoTurmas, true))) {
             writer.write(nomeTurma + ";" + curso + ";" + turno + ";" + anoSemestre + ";" + String.join(",", disciplinasSelecionadas));
             writer.newLine();
             tableModel.addRow(new Object[]{nomeTurma, curso, turno, anoSemestre, String.join(",", disciplinasSelecionadas)});
@@ -143,7 +145,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     }
 
     private void carregarTurmas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("turmas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoTurmas))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");

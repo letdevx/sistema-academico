@@ -1,12 +1,23 @@
 package br.com.sistema.academico.controller;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.util.List;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class TelaBoletimAluno extends JPanel {
 
@@ -38,7 +49,7 @@ public class TelaBoletimAluno extends JPanel {
     }
 
     private void carregarAlunos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("alunos.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");

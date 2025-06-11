@@ -31,6 +31,9 @@ public class TelaMatriculaDisciplina extends JPanel {
     private JList<String> listaDisciplinas;
     private DefaultTableModel tableModel;
 
+    private String arquivoMatriculasDisciplinas = "src/main/resources/data/matriculas_disciplinas.txt";
+    private String arquivoTurmas = "src/main/resources/data/turmas.txt";
+
     public TelaMatriculaDisciplina() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -100,7 +103,7 @@ public class TelaMatriculaDisciplina extends JPanel {
     }
 
     private void carregarAlunos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("alunos.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -114,7 +117,7 @@ public class TelaMatriculaDisciplina extends JPanel {
     }
 
     private void carregarTurmas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("turmas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoTurmas))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -131,7 +134,7 @@ public class TelaMatriculaDisciplina extends JPanel {
         String turmaSelecionada = (String) comboTurmas.getSelectedItem();
         if (turmaSelecionada == null) return;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("turmas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoTurmas))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -159,7 +162,7 @@ public class TelaMatriculaDisciplina extends JPanel {
         String cpf = aluno.split(" - ")[1];
         String disciplinasString = String.join(",", disciplinas);
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("matriculas_disciplinas.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoMatriculasDisciplinas, true))) {
             writer.write(cpf + ";" + turma + ";" + disciplinasString);
             writer.newLine();
             tableModel.addRow(new String[]{cpf, turma, disciplinasString});
@@ -170,7 +173,7 @@ public class TelaMatriculaDisciplina extends JPanel {
     }
 
     private void carregarMatriculas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("matriculas_disciplinas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoMatriculasDisciplinas))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");

@@ -1,9 +1,22 @@
 package br.com.sistema.academico.controller;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class TelaLancamentoNotas extends JPanel {
 
@@ -49,7 +62,7 @@ public class TelaLancamentoNotas extends JPanel {
     }
 
     private void carregarAlunos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("alunos.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -63,7 +76,7 @@ public class TelaLancamentoNotas extends JPanel {
     }
 
     private void carregarDisciplinas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("disciplinas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/disciplinas.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 comboDisciplinas.addItem(linha);

@@ -29,7 +29,6 @@ import br.com.sistema.academico.service.AlunoService;
 public class TelaCadastroAluno extends TelaCadastroTemplate {
     
     private static TelaCadastroAluno instancia;
-    private static String arquivoSaida = "alunos.txt"; // Arquivo de saída
 
     private JTextField campoNome;
     private JFormattedTextField campoDataNascimento, campoCpf, campoRg;
@@ -52,7 +51,6 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
 
     // Método para configurar arquivo de saída (para testes)
     public static void setArquivoSaida(String arquivo) {
-        arquivoSaida = arquivo;
         // Atualiza também no serviço
         getInstancia().alunoService.setArquivoSaida(arquivo);
     }

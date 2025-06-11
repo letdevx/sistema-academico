@@ -24,6 +24,8 @@ public class TelaCadastroDisciplina extends JPanel {
     private DefaultListModel<String> listaModel;
     private JList<String> listaDisciplinas;
 
+    private String arquivoDisciplinas = "src/main/resources/data/disciplinas.txt";
+
     public TelaCadastroDisciplina() {
         setLayout(new BorderLayout());
 
@@ -54,7 +56,7 @@ public class TelaCadastroDisciplina extends JPanel {
             return;
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("disciplinas.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoDisciplinas, true))) {
             writer.write(nome);
             writer.newLine();
             listaModel.addElement(nome);
@@ -66,7 +68,7 @@ public class TelaCadastroDisciplina extends JPanel {
     }
 
     private void carregarDisciplinas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("disciplinas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoDisciplinas))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 listaModel.addElement(linha);

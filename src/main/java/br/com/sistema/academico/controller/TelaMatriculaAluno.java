@@ -27,6 +27,8 @@ public class TelaMatriculaAluno extends JPanel {
     private JComboBox<String> comboTurmas;
     private DefaultTableModel tableModel;
 
+    private String arquivoMatriculas = "src/main/resources/data/matriculas.txt";
+
     public TelaMatriculaAluno() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -83,7 +85,7 @@ public class TelaMatriculaAluno extends JPanel {
     }
 
     private void carregarAlunos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("alunos.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -97,7 +99,7 @@ public class TelaMatriculaAluno extends JPanel {
     }
 
     private void carregarTurmas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("turmas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/turmas.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 comboTurmas.addItem(linha);
@@ -114,7 +116,7 @@ public class TelaMatriculaAluno extends JPanel {
 
         String cpf = aluno.split(" - ")[0];
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("matriculas.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoMatriculas, true))) {
             writer.write(cpf + ";" + turma);
             writer.newLine();
             tableModel.addRow(new String[]{cpf, turma});
@@ -125,7 +127,7 @@ public class TelaMatriculaAluno extends JPanel {
     }
 
     private void carregarMatriculas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("matriculas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoMatriculas))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 tableModel.addRow(linha.split(";"));
