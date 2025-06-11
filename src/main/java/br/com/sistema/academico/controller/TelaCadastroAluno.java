@@ -1,15 +1,30 @@
 package br.com.sistema.academico.controller;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.IOException;
 import java.text.ParseException;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
 
 import br.com.sistema.academico.factory.ComponenteFactory;
 import br.com.sistema.academico.factory.SwingComponenteFactory;
+import br.com.sistema.academico.service.AlunoService;
 
 public class TelaCadastroAluno extends TelaCadastroTemplate {
     
@@ -22,6 +37,7 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
     private JTextField campoNacionalidade, campoNaturalidade, campoOrgaoEmissor;
     private JFormattedTextField campoDataEmissao;
     private ComponenteFactory factory;
+    private AlunoService alunoService = new AlunoService();
 
     public static TelaCadastroAluno getInstancia() {
         if (instancia == null) {
@@ -37,6 +53,8 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
     // Método para configurar arquivo de saída (para testes)
     public static void setArquivoSaida(String arquivo) {
         arquivoSaida = arquivo;
+        // Atualiza também no serviço
+        getInstancia().alunoService.setArquivoSaida(arquivo);
     }
 
     private JTextField criarCampoTexto(String nome, String valorPadrao) {
@@ -224,52 +242,39 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
     }
 
     private boolean validarCampos() {
-        if (campoNome.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nome é obrigatório!");
+        try {
+            alunoService.validarCampos(
+                campoNome.getText(),
+                campoDataNascimento.getText(),
+                campoGenero.getSelectedIndex(),
+                campoCpf.getText()
+            );
+            return true;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
             return false;
         }
-        if (campoDataNascimento.getText().equals("__/__/____")) {
-            JOptionPane.showMessageDialog(this, "Data de nascimento é obrigatória!");
-            return false;
-        }
-        if (campoGenero.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this, "Selecione um gênero!");
-            return false;
-        }
-        if (campoCpf.getText().equals("___.___.___-__")) {
-            JOptionPane.showMessageDialog(this, "CPF é obrigatório!");
-            return false;
-        }
-        return true;
     }
 
     private void salvarAluno() {
         if (!validarCampos()) {
             return;
         }
-
         try {
-            File arquivo = new File(arquivoSaida);
-            arquivo.createNewFile(); // Cria o arquivo se não existir
-
-            try (FileWriter writer = new FileWriter(arquivo, true)) {
-                writer.write(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n",
-                    campoNome.getText(),
-                    campoDataNascimento.getText(),
-                    campoGenero.getSelectedItem(),
-                    campoCpf.getText(),
-                    campoRg.getText(),
-                    campoOrgaoEmissor.getText(),
-                    campoDataEmissao.getText(),
-                    campoNacionalidade.getText(),
-                    campoNaturalidade.getText(),
-                    campoEstadoCivil.getSelectedItem()
-                ));
-            }
-
+            alunoService.salvarAluno(
+                campoNome.getText(),
+                campoDataNascimento.getText(),
+                campoGenero.getSelectedItem().toString(),
+                campoCpf.getText(),
+                campoRg.getText(),
+                campoOrgaoEmissor.getText(),
+                campoDataEmissao.getText(),
+                campoNacionalidade.getText(),
+                campoNaturalidade.getText(),
+                campoEstadoCivil.getSelectedItem().toString()
+            );
             limparCampos();
             mostrarMensagemSucesso("Aluno cadastrado com sucesso!");
-
         } catch (IOException e) {
             mostrarMensagemErro("Erro ao salvar aluno: " + e.getMessage());
         }
