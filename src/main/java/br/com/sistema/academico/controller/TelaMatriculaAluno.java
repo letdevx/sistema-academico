@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -22,11 +23,9 @@ public class TelaMatriculaAluno extends JPanel {
 
     private JComboBox<String> comboAlunos;
     private JComboBox<String> comboTurmas;
-    private DefaultTableModel tableModel;
+    private final DefaultTableModel tableModel;
 
-    private String arquivoMatriculas = "src/main/resources/data/matriculas.txt";
-
-    private MatriculaAlunoService matriculaAlunoService = new MatriculaAlunoService();
+    private final MatriculaAlunoService matriculaAlunoService = new MatriculaAlunoService();
 
     public TelaMatriculaAluno() {
         setLayout(new BorderLayout());
@@ -126,7 +125,7 @@ public class TelaMatriculaAluno extends JPanel {
             JOptionPane.showMessageDialog(this, "Matrícula realizada com sucesso!");
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula: " + e.getMessage());
         }
     }

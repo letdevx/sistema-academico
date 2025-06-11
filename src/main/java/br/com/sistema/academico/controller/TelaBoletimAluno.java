@@ -21,8 +21,8 @@ import javax.swing.JTextArea;
 
 public class TelaBoletimAluno extends JPanel {
 
-    private JComboBox<String> comboAlunos;
-    private JTextArea areaBoletim;
+    private final JComboBox<String> comboAlunos;
+    private final JTextArea areaBoletim;
 
     public TelaBoletimAluno() {
         setLayout(new BorderLayout());

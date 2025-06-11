@@ -20,12 +20,12 @@ import br.com.sistema.academico.service.LancamentoNotasService;
 
 public class TelaLancamentoNotas extends JPanel {
 
-    private JComboBox<String> comboAlunos;
-    private JComboBox<String> comboDisciplinas;
-    private JTextField campoNota;
-    private JTextArea areaResultados;
+    private final JComboBox<String> comboAlunos;
+    private final JComboBox<String> comboDisciplinas;
+    private final JTextField campoNota;
+    private final JTextArea areaResultados;
 
-    private LancamentoNotasService lancamentoNotasService = new LancamentoNotasService();
+    private final LancamentoNotasService lancamentoNotasService = new LancamentoNotasService();
 
     public TelaLancamentoNotas() {
         setLayout(new BorderLayout());
@@ -99,7 +99,7 @@ public class TelaLancamentoNotas extends JPanel {
             campoNota.setText("");
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar nota: " + e.getMessage());
         }
     }
@@ -116,7 +116,7 @@ public class TelaLancamentoNotas extends JPanel {
             while ((linha = reader.readLine()) != null) {
                 areaResultados.append("Registrado: " + linha + "\n");
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             areaResultados.setText("Nenhuma nota registrada ainda.");
         }
     }

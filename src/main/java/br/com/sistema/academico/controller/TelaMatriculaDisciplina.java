@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -26,9 +27,9 @@ public class TelaMatriculaDisciplina extends JPanel {
     private JComboBox<String> comboAlunos;
     private JComboBox<String> comboTurmas;
     private JList<String> listaDisciplinas;
-    private DefaultTableModel tableModel;
+    private final DefaultTableModel tableModel;
 
-    private MatriculaDisciplinaService matriculaDisciplinaService = new MatriculaDisciplinaService();
+    private final MatriculaDisciplinaService matriculaDisciplinaService = new MatriculaDisciplinaService();
 
     public TelaMatriculaDisciplina() {
         setLayout(new BorderLayout());
@@ -110,7 +111,7 @@ public class TelaMatriculaDisciplina extends JPanel {
                     comboAlunos.addItem(dados[1] + " - " + dados[0]);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             comboAlunos.addItem("Erro ao carregar alunos");
         }
     }
@@ -127,7 +128,7 @@ public class TelaMatriculaDisciplina extends JPanel {
                     comboTurmas.addItem(dados[0]);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             comboTurmas.addItem("Erro ao carregar turmas");
         }
     }
@@ -147,7 +148,7 @@ public class TelaMatriculaDisciplina extends JPanel {
                     return;
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar disciplinas da turma.");
         }
     }
@@ -167,10 +168,10 @@ public class TelaMatriculaDisciplina extends JPanel {
             String disciplinasString = String.join(",", disciplinas);
             tableModel.addRow(new String[]{cpf, turma, disciplinasString});
             JOptionPane.showMessageDialog(this, "Matrícula em disciplinas realizada!");
-        } catch (IllegalArgumentException e) {
+        } catch (IOException | IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula: " + e.getMessage());
+        } catch (RuntimeException e) {
+            JOptionPane.showMessageDialog(this, "Erro inesperado ao salvar matrícula: " + e.getMessage());
         }
     }
 
@@ -186,7 +187,7 @@ public class TelaMatriculaDisciplina extends JPanel {
                     tableModel.addRow(dados);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             // ok se ainda não existir ou erro de leitura
         }
     }

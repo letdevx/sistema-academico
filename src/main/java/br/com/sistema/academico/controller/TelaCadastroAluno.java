@@ -36,7 +36,7 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
     private JTextField campoNacionalidade, campoNaturalidade, campoOrgaoEmissor;
     private JFormattedTextField campoDataEmissao;
     private ComponenteFactory factory;
-    private AlunoService alunoService = new AlunoService();
+    private final AlunoService alunoService = new AlunoService();
 
     public static TelaCadastroAluno getInstancia() {
         if (instancia == null) {
@@ -63,51 +63,51 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
     }
 
     private JFormattedTextField criarCampoData(String nome) {
-        JFormattedTextField campo = null;
         try {
             MaskFormatter mascara = new MaskFormatter("##/##/####");
             mascara.setPlaceholderCharacter('_');
-            campo = new JFormattedTextField(mascara);
-            campo.setColumns(20);
-            campo.setName(nome);
+            return new JFormattedTextField(mascara) {{
+                setColumns(20);
+                setName(nome);
+            }};
         } catch (ParseException e) {
-            campo = new JFormattedTextField();
-            campo.setColumns(20);
-            campo.setName(nome);
+            return new JFormattedTextField() {{
+                setColumns(20);
+                setName(nome);
+            }};
         }
-        return campo;
     }
 
     private JFormattedTextField criarCampoCPF(String nome) {
-        JFormattedTextField campo = null;
         try {
             MaskFormatter mascara = new MaskFormatter("###.###.###-##");
             mascara.setPlaceholderCharacter('_');
-            campo = new JFormattedTextField(mascara);
-            campo.setColumns(20);
-            campo.setName(nome);
+            return new JFormattedTextField(mascara) {{
+                setColumns(20);
+                setName(nome);
+            }};
         } catch (ParseException e) {
-            campo = new JFormattedTextField();
-            campo.setColumns(20);
-            campo.setName(nome);
+            return new JFormattedTextField() {{
+                setColumns(20);
+                setName(nome);
+            }};
         }
-        return campo;
     }
 
     private JFormattedTextField criarCampoRG(String nome) {
-        JFormattedTextField campo = null;
         try {
             MaskFormatter mascara = new MaskFormatter("##.###.###-#");
             mascara.setPlaceholderCharacter('_');
-            campo = new JFormattedTextField(mascara);
-            campo.setColumns(20);
-            campo.setName(nome);
+            return new JFormattedTextField(mascara) {{
+                setColumns(20);
+                setName(nome);
+            }};
         } catch (ParseException e) {
-            campo = new JFormattedTextField();
-            campo.setColumns(20);
-            campo.setName(nome);
+            return new JFormattedTextField() {{
+                setColumns(20);
+                setName(nome);
+            }};
         }
-        return campo;
     }
 
     @Override
@@ -120,13 +120,11 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        
-        // Título da seção
-        JLabel titulo = new JLabel("Informações Pessoais");
-        titulo.setFont(new Font("Arial", Font.BOLD, 14));
+        JLabel lblTitulo = new JLabel("Informações Pessoais");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
         gbc.gridx = 0; gbc.gridy = 0;
         gbc.gridwidth = 2;
-        painelForm.add(titulo, gbc);
+        painelForm.add(lblTitulo, gbc);
         gbc.gridwidth = 1;
 
         // Nome Completo

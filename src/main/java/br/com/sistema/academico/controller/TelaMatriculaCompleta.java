@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -24,17 +25,13 @@ import br.com.sistema.academico.service.MatriculaDisciplinaService;
 
 public class TelaMatriculaCompleta extends JPanel {
 
-    private JComboBox<String> comboAlunos;
-    private JComboBox<String> comboTurmas;
-    private JList<String> listaDisciplinas;
-    private DefaultTableModel tableModel;
+    private final JComboBox<String> comboAlunos;
+    private final JComboBox<String> comboTurmas;
+    private final JList<String> listaDisciplinas;
+    private final DefaultTableModel tableModel;
 
-    private String arquivoMatriculas = "src/main/resources/data/matriculas.txt";
-    private String arquivoMatriculasDisciplinas = "src/main/resources/data/matriculas_disciplinas.txt";
-    private String arquivoTurmas = "src/main/resources/data/turmas.txt";
-
-    private MatriculaAlunoService matriculaAlunoService = new MatriculaAlunoService();
-    private MatriculaDisciplinaService matriculaDisciplinaService = new MatriculaDisciplinaService();
+    private final MatriculaAlunoService matriculaAlunoService = new MatriculaAlunoService();
+    private final MatriculaDisciplinaService matriculaDisciplinaService = new MatriculaDisciplinaService();
 
     public TelaMatriculaCompleta() {
         setLayout(new BorderLayout());
@@ -115,8 +112,10 @@ public class TelaMatriculaCompleta extends JPanel {
                     comboAlunos.addItem(dados[0] + " - " + dados[1]);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             comboAlunos.addItem("Erro ao carregar alunos");
+        } catch (RuntimeException e) {
+            comboAlunos.addItem("Erro inesperado ao carregar alunos");
         }
     }
 
@@ -132,8 +131,10 @@ public class TelaMatriculaCompleta extends JPanel {
                     comboTurmas.addItem(dados[0]);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             comboTurmas.addItem("Erro ao carregar turmas");
+        } catch (RuntimeException e) {
+            comboTurmas.addItem("Erro inesperado ao carregar turmas");
         }
     }
 
@@ -152,7 +153,7 @@ public class TelaMatriculaCompleta extends JPanel {
                     return;
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar disciplinas da turma.");
         }
     }
@@ -178,8 +179,10 @@ public class TelaMatriculaCompleta extends JPanel {
             JOptionPane.showMessageDialog(this, "Matrícula realizada com sucesso!");
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula: " + e.getMessage());
+        } catch (RuntimeException e) {
+            JOptionPane.showMessageDialog(this, "Erro inesperado ao salvar matrícula");
         }
     }
 
@@ -201,7 +204,7 @@ public class TelaMatriculaCompleta extends JPanel {
                     tableModel.addRow(dados);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             // tudo bem se não existir ou erro de leitura
         }
     }

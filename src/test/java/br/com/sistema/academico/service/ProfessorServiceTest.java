@@ -4,12 +4,16 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.com.sistema.academico.dao.ProfessorDAO;
+
 public class ProfessorServiceTest {
     private ProfessorService service;
+    private ProfessorDAO mockDAO;
 
     @Before
-    public void setUp() {
-        service = new ProfessorService();
+    public void setUp() throws Exception {
+        mockDAO = new MockProfessorDAO();
+        service = new ProfessorService(mockDAO);
     }
 
     @Test

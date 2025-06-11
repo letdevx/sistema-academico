@@ -5,17 +5,14 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import br.com.sistema.academico.dao.ProfessorDAO;
 import br.com.sistema.academico.factory.ComponenteFactory;
 import br.com.sistema.academico.factory.SwingComponenteFactory;
-import br.com.sistema.academico.model.Professor;
 import br.com.sistema.academico.service.ProfessorService;
 
 public class TelaCadastroProfessor extends TelaCadastroTemplate {
@@ -24,14 +21,10 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
     private JTextField campoDepartamento;
     private JTextField campoEmail;
     private ComponenteFactory factory;
-    private ProfessorDAO professorDAO;
-    private ProfessorService professorService = new ProfessorService();
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
-    private static final Pattern CPF_PATTERN = Pattern.compile("^\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}$");
+    private final ProfessorService professorService = new ProfessorService();
 
     public TelaCadastroProfessor() {
         super("Cadastro de Professor");
-        this.professorDAO = new ProfessorDAO();
     }
 
     @Override
@@ -129,42 +122,6 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
         } catch (Exception e) {
             mostrarMensagemErro("Erro ao salvar professor: " + e.getMessage());
         }
-    }
-
-    private boolean validarCampos() {
-        try {
-            professorService.validarCampos(
-                campoNome.getText(),
-                campoCpf.getText(),
-                campoDepartamento.getText(),
-                campoEmail.getText()
-            );
-            return true;
-        } catch (IllegalArgumentException e) {
-            mostrarMensagemErro(e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean validarEmail(String email) {
-        return professorService != null && professorService.validarCampos("nome", "123.456.789-00", "dep", email);
-    }
-
-    private boolean validarCPF(String cpf) {
-        return professorService != null && professorService.validarCampos("nome", cpf, "dep", "email@email.com");
-    }
-
-    private boolean cpfJaExiste(String cpf) {
-        return false; // Lógica já está no serviço
-    }
-
-    private Professor criarProfessor() {
-        Professor professor = new Professor();
-        professor.setNome(campoNome.getText());
-        professor.setCpf(campoCpf.getText());
-        professor.setDepartamento(campoDepartamento.getText());
-        professor.setEmail(campoEmail.getText());
-        return professor;
     }
 
     private void limparCampos() {

@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -29,14 +30,13 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     private JTextField campoTurno;
     private JTextField campoAnoSemestre;
     private JList<String> listaDisciplinas;
-    private DefaultTableModel tableModel;
+    private final DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Nome da Turma", "Curso", "Turno", "Ano/Semestre", "Disciplinas"}, 0);
 
-    private TurmaService turmaService = new TurmaService();
-    private DisciplinaService disciplinaService = new DisciplinaService();
+    private final TurmaService turmaService = new TurmaService();
+    private final DisciplinaService disciplinaService = new DisciplinaService();
 
     public TelaCadastroTurma() {
         super("Cadastro de Turma");
-        tableModel = new DefaultTableModel(new Object[]{"Nome da Turma", "Curso", "Turno", "Ano/Semestre", "Disciplinas"}, 0);
         carregarTurmas();
     }
 
@@ -92,7 +92,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
                     modeloDisciplinas.addElement(d);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             modeloDisciplinas.addElement("Erro ao carregar disciplinas");
         }
 
@@ -138,7 +138,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
             mostrarMensagemSucesso("Turma salva com sucesso!");
         } catch (IllegalArgumentException e) {
             mostrarMensagemErro(e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             mostrarMensagemErro("Erro ao salvar turma: " + e.getMessage());
         }
     }
@@ -155,7 +155,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
                     tableModel.addRow(new Object[]{dados[0], dados[1], dados[2], dados[3], dados[4]});
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             // Ignorar erro de leitura inicial
         }
     }

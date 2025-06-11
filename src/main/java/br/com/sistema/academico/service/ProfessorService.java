@@ -14,6 +14,11 @@ public class ProfessorService {
         this.professorDAO = new ProfessorDAO();
     }
 
+    // Construtor alternativo para testes, permitindo injetar um mock de ProfessorDAO
+    public ProfessorService(ProfessorDAO professorDAO) {
+        this.professorDAO = professorDAO;
+    }
+
     public boolean validarCampos(String nome, String cpf, String departamento, String email) {
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome é obrigatório!");

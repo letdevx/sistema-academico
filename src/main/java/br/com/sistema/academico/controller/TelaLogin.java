@@ -24,7 +24,7 @@ import br.com.sistema.academico.service.LoginService;
 public class TelaLogin extends LoginTemplate {
 
     private static TelaLogin instancia;
-    private LoginService loginService = new LoginService();
+    private final LoginService loginService = new LoginService();
 
     public static TelaLogin getInstancia() {
         if (instancia == null) {

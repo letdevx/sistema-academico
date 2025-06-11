@@ -2,6 +2,7 @@ package br.com.sistema.academico.controller;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -17,11 +18,11 @@ import br.com.sistema.academico.service.DisciplinaService;
 
 public class TelaCadastroDisciplina extends JPanel {
 
-    private JTextField campoNomeDisciplina;
-    private DefaultListModel<String> listaModel;
-    private JList<String> listaDisciplinas;
+    private final JTextField campoNomeDisciplina;
+    private final DefaultListModel<String> listaModel;
+    private final JList<String> listaDisciplinas;
 
-    private DisciplinaService disciplinaService = new DisciplinaService();
+    private final DisciplinaService disciplinaService = new DisciplinaService();
 
     public TelaCadastroDisciplina() {
         setLayout(new BorderLayout());
@@ -55,7 +56,7 @@ public class TelaCadastroDisciplina extends JPanel {
             JOptionPane.showMessageDialog(this, "Disciplina cadastrada com sucesso!");
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar disciplina: " + e.getMessage());
         }
     }
@@ -70,7 +71,7 @@ public class TelaCadastroDisciplina extends JPanel {
             while ((linha = reader.readLine()) != null) {
                 listaModel.addElement(linha);
             }
-        } catch (Exception e) {
+        } catch (java.io.IOException | RuntimeException e) {
             // Arquivo ainda não existe ou erro de leitura
         }
     }
