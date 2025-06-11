@@ -33,4 +33,4 @@ ehthumbs.db         # Windows
 *~
 
 # === Banco de Dados ===
-*.db
+**/resources/data/

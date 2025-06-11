@@ -1,8 +1,0 @@
-João Silva;12345678900;Masculino;joao@email.com;Medicina;2025/1
-Maria Oliveira;98765432100;Feminino;maria@email.com;Medicina;2025/1
-Carlos Lima;55566677700;Masculino;carlos@email.com;Medicina;2025/2
-Ana Souza;11122233344;Feminino;ana@email.com;Medicina;2025/2
-Fernanda Costa;99988877766;Feminino;fernanda@email.com;Medicina;2026/1
-Ricardo Alves;44455566677;Masculino;ricardo@email.com;Medicina;2026/2
-Patrícia Gomes;33322211100;Feminino;patricia@email.com;Medicina;2025/2
-Bruno Rocha;88877766655;Masculino;bruno@email.com;Medicina;2025/1

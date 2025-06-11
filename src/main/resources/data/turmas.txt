@@ -1,2 +1,0 @@
-2 ano;Administração;Tarde;3;Física
-1 ano;Medicina;Manhã;1 semestre;Biologia
