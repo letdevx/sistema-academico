@@ -33,7 +33,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     private final DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Nome da Turma", "Curso", "Turno", "Ano/Semestre", "Disciplinas"}, 0);
 
     private final TurmaService turmaService = new TurmaService();
-    private final DisciplinaService disciplinaService = new DisciplinaService();
+    private DisciplinaService disciplinaService;
 
     public TelaCadastroTurma() {
         super("Cadastro de Turma");
@@ -42,6 +42,8 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
 
     @Override
     protected JPanel criarFormulario() {
+        disciplinaService = new DisciplinaService();
+
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Cadastro de Turma"));
         GridBagConstraints gbc = new GridBagConstraints();
