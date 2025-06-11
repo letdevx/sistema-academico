@@ -5,12 +5,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -25,6 +19,9 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
+import br.com.sistema.academico.service.MatriculaAlunoService;
+import br.com.sistema.academico.service.MatriculaDisciplinaService;
+
 public class TelaMatriculaCompleta extends JPanel {
 
     private JComboBox<String> comboAlunos;
@@ -35,6 +32,9 @@ public class TelaMatriculaCompleta extends JPanel {
     private String arquivoMatriculas = "src/main/resources/data/matriculas.txt";
     private String arquivoMatriculasDisciplinas = "src/main/resources/data/matriculas_disciplinas.txt";
     private String arquivoTurmas = "src/main/resources/data/turmas.txt";
+
+    private MatriculaAlunoService matriculaAlunoService = new MatriculaAlunoService();
+    private MatriculaDisciplinaService matriculaDisciplinaService = new MatriculaDisciplinaService();
 
     public TelaMatriculaCompleta() {
         setLayout(new BorderLayout());
@@ -105,21 +105,26 @@ public class TelaMatriculaCompleta extends JPanel {
 
     private void carregarAlunos() {
         comboAlunos.removeAllItems();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
+        java.io.File file = new java.io.File("src/main/resources/data/alunos.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
                 if (dados.length > 1) {
-                    comboAlunos.addItem(dados[0] + " - " + dados[1]); // Nome - CPF
+                    comboAlunos.addItem(dados[0] + " - " + dados[1]);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             comboAlunos.addItem("Erro ao carregar alunos");
         }
     }
 
     private void carregarTurmas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoTurmas))) {
+        comboTurmas.removeAllItems();
+        java.io.File file = new java.io.File("src/main/resources/data/turmas.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -127,7 +132,7 @@ public class TelaMatriculaCompleta extends JPanel {
                     comboTurmas.addItem(dados[0]);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             comboTurmas.addItem("Erro ao carregar turmas");
         }
     }
@@ -135,8 +140,9 @@ public class TelaMatriculaCompleta extends JPanel {
     private void atualizarDisciplinas() {
         String turmaSelecionada = (String) comboTurmas.getSelectedItem();
         if (turmaSelecionada == null) return;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoTurmas))) {
+        java.io.File file = new java.io.File("src/main/resources/data/turmas.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -146,7 +152,7 @@ public class TelaMatriculaCompleta extends JPanel {
                     return;
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar disciplinas da turma.");
         }
     }
@@ -155,46 +161,25 @@ public class TelaMatriculaCompleta extends JPanel {
         String aluno = (String) comboAlunos.getSelectedItem();
         String turma = (String) comboTurmas.getSelectedItem();
         List<String> disciplinas = listaDisciplinas.getSelectedValuesList();
-
         if (aluno == null || turma == null || disciplinas.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Selecione aluno, turma e ao menos uma disciplina.");
             return;
         }
-
         String cpf = aluno.split(" - ")[1];
         String disciplinasString = String.join(",", disciplinas);
-
-        boolean jaMatriculado = false;
-        File arquivoTurma = new File(arquivoMatriculas);
-        if (arquivoTurma.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(arquivoTurma))) {
-                String linha;
-                while ((linha = reader.readLine()) != null) {
-                    String[] dados = linha.split(";");
-                    if (dados.length == 2 && dados[0].equals(cpf) && dados[1].equals(turma)) {
-                        jaMatriculado = true;
-                        break;
-                    }
-                }
-            } catch (IOException ignored) {}
-        }
-
-        if (!jaMatriculado) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoMatriculas, true))) {
-                writer.write(cpf + ";" + turma);
-                writer.newLine();
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula na turma.");
-            }
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoMatriculasDisciplinas, true))) {
-            writer.write(cpf + ";" + turma + ";" + disciplinasString);
-            writer.newLine();
+        try {
+            // Validação e matrícula na turma
+            matriculaAlunoService.validarCampos(cpf, turma);
+            matriculaAlunoService.salvarMatricula(cpf, turma);
+            // Validação e matrícula nas disciplinas
+            matriculaDisciplinaService.validarCampos(cpf, turma, disciplinas);
+            matriculaDisciplinaService.salvarMatricula(cpf, turma, disciplinas);
             tableModel.addRow(new String[]{cpf, turma, disciplinasString});
             JOptionPane.showMessageDialog(this, "Matrícula realizada com sucesso!");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula nas disciplinas.");
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula: " + e.getMessage());
         }
     }
 
@@ -205,7 +190,10 @@ public class TelaMatriculaCompleta extends JPanel {
     }
 
     private void carregarMatriculas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoMatriculasDisciplinas))) {
+        tableModel.setRowCount(0);
+        java.io.File file = new java.io.File("src/main/resources/data/matriculas_disciplinas.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -213,8 +201,8 @@ public class TelaMatriculaCompleta extends JPanel {
                     tableModel.addRow(dados);
                 }
             }
-        } catch (IOException e) {
-            // tudo bem se não existir
+        } catch (Exception e) {
+            // tudo bem se não existir ou erro de leitura
         }
     }
 }

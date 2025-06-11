@@ -5,11 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -17,13 +12,15 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+
+import br.com.sistema.academico.service.DisciplinaService;
+import br.com.sistema.academico.service.TurmaService;
 
 public class TelaCadastroTurma extends TelaCadastroTemplate {
 
@@ -34,7 +31,8 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     private JList<String> listaDisciplinas;
     private DefaultTableModel tableModel;
 
-    private String arquivoTurmas = "src/main/resources/data/turmas.txt";
+    private TurmaService turmaService = new TurmaService();
+    private DisciplinaService disciplinaService = new DisciplinaService();
 
     public TelaCadastroTurma() {
         super("Cadastro de Turma");
@@ -85,13 +83,17 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
         gbc.gridx = 1;
 
         DefaultListModel<String> modeloDisciplinas = new DefaultListModel<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/data/disciplinas.txt"))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                modeloDisciplinas.addElement(linha);
+        try {
+            List<String> disciplinas = disciplinaService.listarDisciplinas();
+            if (disciplinas.isEmpty()) {
+                modeloDisciplinas.addElement("Nenhuma disciplina disponível");
+            } else {
+                for (String d : disciplinas) {
+                    modeloDisciplinas.addElement(d);
+                }
             }
-        } catch (IOException e) {
-            modeloDisciplinas.addElement("Nenhuma disciplina disponível");
+        } catch (Exception e) {
+            modeloDisciplinas.addElement("Erro ao carregar disciplinas");
         }
 
         listaDisciplinas = new JList<>(modeloDisciplinas);
@@ -128,24 +130,24 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
         String anoSemestre = campoAnoSemestre.getText().trim();
         List<String> disciplinasSelecionadas = listaDisciplinas.getSelectedValuesList();
 
-        if (nomeTurma.isEmpty() || curso.isEmpty() || turno.isEmpty() || anoSemestre.isEmpty() || disciplinasSelecionadas.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
-            return;
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoTurmas, true))) {
-            writer.write(nomeTurma + ";" + curso + ";" + turno + ";" + anoSemestre + ";" + String.join(",", disciplinasSelecionadas));
-            writer.newLine();
+        try {
+            turmaService.validarCampos(nomeTurma, curso, turno, anoSemestre, disciplinasSelecionadas);
+            turmaService.salvarTurma(nomeTurma, curso, turno, anoSemestre, disciplinasSelecionadas);
             tableModel.addRow(new Object[]{nomeTurma, curso, turno, anoSemestre, String.join(",", disciplinasSelecionadas)});
             limparCampos();
-            JOptionPane.showMessageDialog(this, "Turma salva com sucesso!");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar turma.");
+            mostrarMensagemSucesso("Turma salva com sucesso!");
+        } catch (IllegalArgumentException e) {
+            mostrarMensagemErro(e.getMessage());
+        } catch (Exception e) {
+            mostrarMensagemErro("Erro ao salvar turma: " + e.getMessage());
         }
     }
 
     private void carregarTurmas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoTurmas))) {
+        tableModel.setRowCount(0);
+        java.io.File file = new java.io.File("src/main/resources/data/turmas.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -153,7 +155,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
                     tableModel.addRow(new Object[]{dados[0], dados[1], dados[2], dados[3], dados[4]});
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             // Ignorar erro de leitura inicial
         }
     }

@@ -1,13 +1,22 @@
 package br.com.sistema.academico.controller;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.regex.Pattern;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import br.com.sistema.academico.dao.ProfessorDAO;
 import br.com.sistema.academico.factory.ComponenteFactory;
 import br.com.sistema.academico.factory.SwingComponenteFactory;
 import br.com.sistema.academico.model.Professor;
-import br.com.sistema.academico.dao.ProfessorDAO;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.regex.Pattern;
+import br.com.sistema.academico.service.ProfessorService;
 
 public class TelaCadastroProfessor extends TelaCadastroTemplate {
     private JTextField campoNome;
@@ -16,6 +25,7 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
     private JTextField campoEmail;
     private ComponenteFactory factory;
     private ProfessorDAO professorDAO;
+    private ProfessorService professorService = new ProfessorService();
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern CPF_PATTERN = Pattern.compile("^\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}$");
 
@@ -99,59 +109,53 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
     }
 
     private void salvarProfessor() {
-        if (!validarCampos()) {
-            return;
-        }
-
-        Professor professor = criarProfessor();
         try {
-            professorDAO.save(professor);
+            professorService.validarCampos(
+                campoNome.getText(),
+                campoCpf.getText(),
+                campoDepartamento.getText(),
+                campoEmail.getText()
+            );
+            professorService.salvarProfessor(
+                campoNome.getText(),
+                campoCpf.getText(),
+                campoDepartamento.getText(),
+                campoEmail.getText()
+            );
             limparCampos();
             mostrarMensagemSucesso("Professor salvo com sucesso!");
+        } catch (IllegalArgumentException e) {
+            mostrarMensagemErro(e.getMessage());
         } catch (Exception e) {
             mostrarMensagemErro("Erro ao salvar professor: " + e.getMessage());
         }
     }
 
     private boolean validarCampos() {
-        if (campoNome.getText().trim().isEmpty()) {
-            mostrarMensagemErro("Nome é obrigatório!");
+        try {
+            professorService.validarCampos(
+                campoNome.getText(),
+                campoCpf.getText(),
+                campoDepartamento.getText(),
+                campoEmail.getText()
+            );
+            return true;
+        } catch (IllegalArgumentException e) {
+            mostrarMensagemErro(e.getMessage());
             return false;
         }
-        if (campoCpf.getText().trim().isEmpty()) {
-            mostrarMensagemErro("CPF é obrigatório!");
-            return false;
-        }
-        if (!validarCPF(campoCpf.getText())) {
-            mostrarMensagemErro("CPF inválido!");
-            return false;
-        }
-        if (cpfJaExiste(campoCpf.getText())) {
-            mostrarMensagemErro("CPF já cadastrado!");
-            return false;
-        }
-        if (campoEmail.getText().trim().isEmpty()) {
-            mostrarMensagemErro("E-mail é obrigatório!");
-            return false;
-        }
-        if (!validarEmail(campoEmail.getText())) {
-            mostrarMensagemErro("E-mail inválido!");
-            return false;
-        }
-        return true;
     }
 
     private boolean validarEmail(String email) {
-        return EMAIL_PATTERN.matcher(email).matches();
+        return professorService != null && professorService.validarCampos("nome", "123.456.789-00", "dep", email);
     }
 
     private boolean validarCPF(String cpf) {
-        return CPF_PATTERN.matcher(cpf).matches();
+        return professorService != null && professorService.validarCampos("nome", cpf, "dep", "email@email.com");
     }
 
     private boolean cpfJaExiste(String cpf) {
-        // TODO: Implementar lógica de verificação no banco de dados
-        return false;
+        return false; // Lógica já está no serviço
     }
 
     private Professor criarProfessor() {

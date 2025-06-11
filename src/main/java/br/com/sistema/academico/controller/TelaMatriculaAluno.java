@@ -5,11 +5,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -21,6 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import br.com.sistema.academico.service.MatriculaAlunoService;
+
 public class TelaMatriculaAluno extends JPanel {
 
     private JComboBox<String> comboAlunos;
@@ -28,6 +25,8 @@ public class TelaMatriculaAluno extends JPanel {
     private DefaultTableModel tableModel;
 
     private String arquivoMatriculas = "src/main/resources/data/matriculas.txt";
+
+    private MatriculaAlunoService matriculaAlunoService = new MatriculaAlunoService();
 
     public TelaMatriculaAluno() {
         setLayout(new BorderLayout());
@@ -85,7 +84,10 @@ public class TelaMatriculaAluno extends JPanel {
     }
 
     private void carregarAlunos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
+        comboAlunos.removeAllItems();
+        java.io.File file = new java.io.File("src/main/resources/data/alunos.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -93,18 +95,21 @@ public class TelaMatriculaAluno extends JPanel {
                     comboAlunos.addItem(dados[1] + " - " + dados[0]);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             comboAlunos.addItem("Erro ao carregar alunos");
         }
     }
 
     private void carregarTurmas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/turmas.txt"))) {
+        comboTurmas.removeAllItems();
+        java.io.File file = new java.io.File("src/main/resources/data/turmas.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 comboTurmas.addItem(linha);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             comboTurmas.addItem("Erro ao carregar turmas");
         }
     }
@@ -113,27 +118,30 @@ public class TelaMatriculaAluno extends JPanel {
         String aluno = (String) comboAlunos.getSelectedItem();
         String turma = (String) comboTurmas.getSelectedItem();
         if (aluno == null || turma == null) return;
-
         String cpf = aluno.split(" - ")[0];
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoMatriculas, true))) {
-            writer.write(cpf + ";" + turma);
-            writer.newLine();
+        try {
+            matriculaAlunoService.validarCampos(cpf, turma);
+            matriculaAlunoService.salvarMatricula(cpf, turma);
             tableModel.addRow(new String[]{cpf, turma});
             JOptionPane.showMessageDialog(this, "Matrícula realizada com sucesso!");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula!");
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula: " + e.getMessage());
         }
     }
 
     private void carregarMatriculas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoMatriculas))) {
+        tableModel.setRowCount(0);
+        java.io.File file = new java.io.File("src/main/resources/data/matriculas.txt");
+        if (!file.exists()) return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 tableModel.addRow(linha.split(";"));
             }
-        } catch (IOException e) {
-            // arquivo ainda não existe
+        } catch (Exception e) {
+            // arquivo ainda não existe ou erro de leitura
         }
     }
 }

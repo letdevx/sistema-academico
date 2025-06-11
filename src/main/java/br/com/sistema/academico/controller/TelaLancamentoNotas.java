@@ -3,9 +3,7 @@ package br.com.sistema.academico.controller;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
@@ -18,12 +16,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import br.com.sistema.academico.service.LancamentoNotasService;
+
 public class TelaLancamentoNotas extends JPanel {
 
     private JComboBox<String> comboAlunos;
     private JComboBox<String> comboDisciplinas;
     private JTextField campoNota;
     private JTextArea areaResultados;
+
+    private LancamentoNotasService lancamentoNotasService = new LancamentoNotasService();
 
     public TelaLancamentoNotas() {
         setLayout(new BorderLayout());
@@ -90,29 +92,31 @@ public class TelaLancamentoNotas extends JPanel {
         String aluno = (String) comboAlunos.getSelectedItem();
         String disciplina = (String) comboDisciplinas.getSelectedItem();
         String nota = campoNota.getText().trim();
-
-        if (aluno == null || disciplina == null || nota.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
-            return;
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("notas.txt", true))) {
-            writer.write(aluno + ";" + disciplina + ";" + nota);
-            writer.newLine();
+        try {
+            lancamentoNotasService.validarCampos(aluno, disciplina, nota);
+            lancamentoNotasService.salvarNota(aluno, disciplina, nota);
             areaResultados.append("Nota registrada: " + aluno + " - " + disciplina + " - " + nota + "\n");
             campoNota.setText("");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar nota.");
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar nota: " + e.getMessage());
         }
     }
 
     private void carregarNotasExistentes() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("notas.txt"))) {
+        areaResultados.setText("");
+        java.io.File file = new java.io.File("notas.txt");
+        if (!file.exists()) {
+            areaResultados.setText("Nenhuma nota registrada ainda.");
+            return;
+        }
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 areaResultados.append("Registrado: " + linha + "\n");
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             areaResultados.setText("Nenhuma nota registrada ainda.");
         }
     }

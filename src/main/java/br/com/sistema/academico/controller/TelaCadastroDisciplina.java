@@ -2,11 +2,6 @@ package br.com.sistema.academico.controller;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -18,13 +13,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import br.com.sistema.academico.service.DisciplinaService;
+
 public class TelaCadastroDisciplina extends JPanel {
 
     private JTextField campoNomeDisciplina;
     private DefaultListModel<String> listaModel;
     private JList<String> listaDisciplinas;
 
-    private String arquivoDisciplinas = "src/main/resources/data/disciplinas.txt";
+    private DisciplinaService disciplinaService = new DisciplinaService();
 
     public TelaCadastroDisciplina() {
         setLayout(new BorderLayout());
@@ -50,31 +47,31 @@ public class TelaCadastroDisciplina extends JPanel {
 
     private void salvarDisciplina() {
         String nome = campoNomeDisciplina.getText().trim();
-
-        if (nome.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Informe o nome da disciplina.");
-            return;
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoDisciplinas, true))) {
-            writer.write(nome);
-            writer.newLine();
+        try {
+            disciplinaService.validarNome(nome);
+            disciplinaService.salvarDisciplina(nome);
             listaModel.addElement(nome);
             campoNomeDisciplina.setText("");
             JOptionPane.showMessageDialog(this, "Disciplina cadastrada com sucesso!");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar disciplina.");
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar disciplina: " + e.getMessage());
         }
     }
 
     private void carregarDisciplinas() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(arquivoDisciplinas))) {
+        listaModel.clear();
+        java.io.File file = new java.io.File("src/main/resources/data/disciplinas.txt");
+        if (!file.exists())
+            return;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 listaModel.addElement(linha);
             }
-        } catch (IOException e) {
-            // Arquivo ainda não existe
+        } catch (Exception e) {
+            // Arquivo ainda não existe ou erro de leitura
         }
     }
 }
