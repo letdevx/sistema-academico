@@ -11,7 +11,7 @@ import java.util.Optional;
 import br.com.sistema.academico.database.DatabaseManager;
 import br.com.sistema.academico.model.Professor;
 
-public class ProfessorDAO implements DAO<Professor> {
+public class ProfessorDAO implements Repository<Professor> {
     private final Connection connection;
 
     public ProfessorDAO() {
