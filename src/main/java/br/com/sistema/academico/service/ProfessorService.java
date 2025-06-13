@@ -6,17 +6,17 @@ import br.com.sistema.academico.dao.ProfessorRepository;
 import br.com.sistema.academico.model.Professor;
 
 public class ProfessorService {
-    private final ProfessorRepository professorDAO;
+    private final ProfessorRepository professorRepository;
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern CPF_PATTERN = Pattern.compile("^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$");
 
     public ProfessorService() {
-        this.professorDAO = new ProfessorRepository();
+        this.professorRepository = new ProfessorRepository();
     }
 
     // Construtor alternativo para testes, permitindo injetar um mock de ProfessorDAO
-    public ProfessorService(ProfessorRepository professorDAO) {
-        this.professorDAO = professorDAO;
+    public ProfessorService(ProfessorRepository professorRepository) {
+        this.professorRepository = professorRepository;
     }
 
     public boolean validarCampos(String nome, String cpf, String departamento, String email) {
@@ -47,7 +47,7 @@ public class ProfessorService {
         professor.setCpf(cpf);
         professor.setDepartamento(departamento);
         professor.setEmail(email);
-        professorDAO.save(professor);
+        professorRepository.save(professor);
     }
 
     private boolean validarEmail(String email) {
@@ -59,6 +59,6 @@ public class ProfessorService {
     }
 
     private boolean cpfJaExiste(String cpf) {
-        return professorDAO.findByCpf(cpf).isPresent();
+        return professorRepository.findByCpf(cpf).isPresent();
     }
 }
