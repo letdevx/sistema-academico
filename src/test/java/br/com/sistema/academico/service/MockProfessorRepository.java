@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import br.com.sistema.academico.dao.ProfessorDAO;
+import br.com.sistema.academico.dao.ProfessorRepository;
 import br.com.sistema.academico.model.Professor;
 
-public class MockProfessorDAO extends ProfessorDAO {
+public class MockProfessorRepository extends ProfessorRepository {
     private final List<Professor> professores = new ArrayList<>();
 
-    public MockProfessorDAO() {
+    public MockProfessorRepository() {
         super(); // Pode ser vazio, pois não usaremos o banco real
     }
 

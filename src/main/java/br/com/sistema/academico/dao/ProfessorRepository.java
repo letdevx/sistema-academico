@@ -11,10 +11,10 @@ import java.util.Optional;
 import br.com.sistema.academico.database.DatabaseManager;
 import br.com.sistema.academico.model.Professor;
 
-public class ProfessorDAO implements Repository<Professor> {
+public class ProfessorRepository implements Repository<Professor> {
     private final Connection connection;
 
-    public ProfessorDAO() {
+    public ProfessorRepository() {
         this.connection = DatabaseManager.getInstance().getConnection();
     }
 

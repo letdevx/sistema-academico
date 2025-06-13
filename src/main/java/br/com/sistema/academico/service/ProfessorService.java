@@ -2,20 +2,20 @@ package br.com.sistema.academico.service;
 
 import java.util.regex.Pattern;
 
-import br.com.sistema.academico.dao.ProfessorDAO;
+import br.com.sistema.academico.dao.ProfessorRepository;
 import br.com.sistema.academico.model.Professor;
 
 public class ProfessorService {
-    private final ProfessorDAO professorDAO;
+    private final ProfessorRepository professorDAO;
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern CPF_PATTERN = Pattern.compile("^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$");
 
     public ProfessorService() {
-        this.professorDAO = new ProfessorDAO();
+        this.professorDAO = new ProfessorRepository();
     }
 
     // Construtor alternativo para testes, permitindo injetar um mock de ProfessorDAO
-    public ProfessorService(ProfessorDAO professorDAO) {
+    public ProfessorService(ProfessorRepository professorDAO) {
         this.professorDAO = professorDAO;
     }
 
