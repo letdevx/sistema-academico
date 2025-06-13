@@ -35,3 +35,5 @@ ehthumbs.db         # Windows
 # === Banco de Dados ===
 **/resources/data/
 **/test/resources/
+
+**/.DS_Store

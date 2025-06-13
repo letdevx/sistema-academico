@@ -41,7 +41,7 @@ public class TelaLogin extends LoginTemplate {
         imagemLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         // Carrega e redimensiona a imagem
-        ImageIcon imagemOriginal = new ImageIcon("login_image.png"); // <- nome do arquivo da imagem
+        ImageIcon imagemOriginal = new ImageIcon("src/main/resources/images/login_image.png"); // <- nome do arquivo da imagem
         Image imagemRedimensionada = imagemOriginal.getImage().getScaledInstance(500, 600, Image.SCALE_SMOOTH);
         imagemLabel.setIcon(new ImageIcon(imagemRedimensionada));
 
