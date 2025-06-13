@@ -19,10 +19,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import br.com.sistema.academico.model.Aluno;
+import br.com.sistema.academico.service.AlunoService;
+
 public class TelaBoletimAluno extends JPanel {
 
     private final JComboBox<String> comboAlunos;
     private final JTextArea areaBoletim;
+    private final AlunoService alunoService = new AlunoService();
 
     public TelaBoletimAluno() {
         setLayout(new BorderLayout());
@@ -49,16 +53,9 @@ public class TelaBoletimAluno extends JPanel {
     }
 
     private void carregarAlunos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
-            String linha;
-            while ((linha = reader.readLine()) != null) {
-                String[] dados = linha.split(";");
-                if (dados.length > 0) {
-                    comboAlunos.addItem(dados[0]);
-                }
-            }
-        } catch (IOException e) {
-            comboAlunos.addItem("Nenhum aluno encontrado");
+        comboAlunos.removeAllItems();
+        for (Aluno aluno : alunoService.listarAlunos()) {
+            comboAlunos.addItem(aluno.getNome());
         }
     }
 

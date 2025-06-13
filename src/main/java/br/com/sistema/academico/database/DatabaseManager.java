@@ -50,8 +50,17 @@ public class DatabaseManager {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome TEXT NOT NULL,
                     cpf TEXT UNIQUE NOT NULL,
-                    matricula TEXT UNIQUE NOT NULL,
-                    email TEXT NOT NULL
+                    data_nascimento TEXT,
+                    sexo TEXT,
+                    email TEXT,
+                    telefone TEXT,
+                    endereco TEXT,
+                    curso TEXT,
+                    grau TEXT,
+                    turno TEXT,
+                    data_ingresso TEXT,
+                    situacao TEXT,
+                    periodo TEXT
                 )
             """);
 

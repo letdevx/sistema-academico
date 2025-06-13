@@ -20,6 +20,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
+import br.com.sistema.academico.model.Aluno;
+import br.com.sistema.academico.service.AlunoService;
 import br.com.sistema.academico.service.MatriculaDisciplinaService;
 
 public class TelaMatriculaDisciplina extends JPanel {
@@ -30,6 +32,7 @@ public class TelaMatriculaDisciplina extends JPanel {
     private final DefaultTableModel tableModel;
 
     private final MatriculaDisciplinaService matriculaDisciplinaService = new MatriculaDisciplinaService();
+    private final AlunoService alunoService = new AlunoService();
 
     public TelaMatriculaDisciplina() {
         setLayout(new BorderLayout());
@@ -101,18 +104,8 @@ public class TelaMatriculaDisciplina extends JPanel {
 
     private void carregarAlunos() {
         comboAlunos.removeAllItems();
-        java.io.File file = new java.io.File("src/main/resources/data/alunos.txt");
-        if (!file.exists()) return;
-        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
-            String linha;
-            while ((linha = reader.readLine()) != null) {
-                String[] dados = linha.split(";");
-                if (dados.length > 1) {
-                    comboAlunos.addItem(dados[1] + " - " + dados[0]);
-                }
-            }
-        } catch (IOException | RuntimeException e) {
-            comboAlunos.addItem("Erro ao carregar alunos");
+        for (Aluno aluno : alunoService.listarAlunos()) {
+            comboAlunos.addItem(aluno.getCpf() + " - " + aluno.getNome());
         }
     }
 

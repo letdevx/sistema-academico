@@ -16,6 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import br.com.sistema.academico.model.Aluno;
+import br.com.sistema.academico.service.AlunoService;
 import br.com.sistema.academico.service.LancamentoNotasService;
 
 public class TelaLancamentoNotas extends JPanel {
@@ -26,6 +28,7 @@ public class TelaLancamentoNotas extends JPanel {
     private final JTextArea areaResultados;
 
     private final LancamentoNotasService lancamentoNotasService = new LancamentoNotasService();
+    private final AlunoService alunoService = new AlunoService();
 
     public TelaLancamentoNotas() {
         setLayout(new BorderLayout());
@@ -64,16 +67,9 @@ public class TelaLancamentoNotas extends JPanel {
     }
 
     private void carregarAlunos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/alunos.txt"))) {
-            String linha;
-            while ((linha = reader.readLine()) != null) {
-                String[] dados = linha.split(";");
-                if (dados.length > 0) {
-                    comboAlunos.addItem(dados[0]); // Nome do aluno
-                }
-            }
-        } catch (IOException e) {
-            comboAlunos.addItem("Nenhum aluno encontrado");
+        comboAlunos.removeAllItems();
+        for (Aluno aluno : alunoService.listarAlunos()) {
+            comboAlunos.addItem(aluno.getNome());
         }
     }
 
