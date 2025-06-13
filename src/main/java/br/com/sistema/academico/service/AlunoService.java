@@ -1,14 +1,19 @@
 package br.com.sistema.academico.service;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.List;
+
+import br.com.sistema.academico.dao.AlunoRepository;
+import br.com.sistema.academico.model.Aluno;
 
 public class AlunoService {
-    private String arquivoSaida = "src/main/resources/data/alunos.txt";
+    private final AlunoRepository alunoRepository;
 
-    public void setArquivoSaida(String arquivo) {
-        this.arquivoSaida = arquivo;
+    public AlunoService() {
+        this.alunoRepository = new AlunoRepository();
+    }
+
+    public AlunoService(AlunoRepository alunoRepository) {
+        this.alunoRepository = alunoRepository;
     }
 
     public boolean validarCampos(String nome, String dataNascimento, int generoIndex, String cpf) {
@@ -24,25 +29,21 @@ public class AlunoService {
         if (cpf == null || cpf.equals("___.___.___-__")) {
             throw new IllegalArgumentException("CPF é obrigatório!");
         }
+        if (cpfJaExiste(cpf)) {
+            throw new IllegalArgumentException("CPF já cadastrado!");
+        }
         return true;
     }
 
-    public void salvarAluno(String nome, String dataNascimento, String genero, String cpf, String rg, String orgaoEmissor, String dataEmissao, String nacionalidade, String naturalidade, String estadoCivil) throws IOException {
-        File arquivo = new File(arquivoSaida);
-        arquivo.createNewFile();
-        try (FileWriter writer = new FileWriter(arquivo, true)) {
-            writer.write(String.format("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n",
-                nome,
-                dataNascimento,
-                genero,
-                cpf,
-                rg,
-                orgaoEmissor,
-                dataEmissao,
-                nacionalidade,
-                naturalidade,
-                estadoCivil
-            ));
-        }
+    public void salvarAluno(Aluno aluno) {
+        alunoRepository.save(aluno);
+    }
+
+    public List<Aluno> listarAlunos() {
+        return alunoRepository.findAll();
+    }
+
+    public boolean cpfJaExiste(String cpf) {
+        return alunoRepository.findByCpf(cpf).isPresent();
     }
 }

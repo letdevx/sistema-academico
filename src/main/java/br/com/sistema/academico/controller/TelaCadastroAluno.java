@@ -9,7 +9,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.IOException;
 import java.text.ParseException;
 
 import javax.swing.BorderFactory;
@@ -24,6 +23,7 @@ import javax.swing.text.MaskFormatter;
 
 import br.com.sistema.academico.factory.ComponenteFactory;
 import br.com.sistema.academico.factory.SwingComponenteFactory;
+import br.com.sistema.academico.model.Aluno;
 import br.com.sistema.academico.service.AlunoService;
 
 public class TelaCadastroAluno extends TelaCadastroTemplate {
@@ -47,12 +47,6 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
 
     private TelaCadastroAluno() {
         super("Cadastro de Alunos");
-    }
-
-    // Método para configurar arquivo de saída (para testes)
-    public static void setArquivoSaida(String arquivo) {
-        // Atualiza também no serviço
-        getInstancia().alunoService.setArquivoSaida(arquivo);
     }
 
     private JTextField criarCampoTexto(String nome, String valorPadrao) {
@@ -257,21 +251,25 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
             return;
         }
         try {
-            alunoService.salvarAluno(
+            Aluno aluno = new Aluno(
                 campoNome.getText(),
+                campoCpf.getText(),
                 campoDataNascimento.getText(),
                 campoGenero.getSelectedItem().toString(),
-                campoCpf.getText(),
-                campoRg.getText(),
-                campoOrgaoEmissor.getText(),
-                campoDataEmissao.getText(),
-                campoNacionalidade.getText(),
-                campoNaturalidade.getText(),
-                campoEstadoCivil.getSelectedItem().toString()
+                "", // email
+                "", // telefone
+                "", // endereco
+                "", // curso
+                "", // grau
+                "", // turno
+                "", // dataIngresso
+                "", // situacao
+                ""  // periodo
             );
+            alunoService.salvarAluno(aluno);
             limparCampos();
             mostrarMensagemSucesso("Aluno cadastrado com sucesso!");
-        } catch (IOException e) {
+        } catch (Exception e) {
             mostrarMensagemErro("Erro ao salvar aluno: " + e.getMessage());
         }
     }
