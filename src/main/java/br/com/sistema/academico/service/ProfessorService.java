@@ -50,6 +50,10 @@ public class ProfessorService {
         professorRepository.save(professor);
     }
 
+    public java.util.List<Professor> listarProfessores() {
+        return professorRepository.findAll();
+    }
+
     private boolean validarEmail(String email) {
         return EMAIL_PATTERN.matcher(email).matches();
     }

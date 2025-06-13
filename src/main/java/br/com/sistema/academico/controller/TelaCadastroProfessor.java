@@ -5,14 +5,19 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import br.com.sistema.academico.factory.ComponenteFactory;
 import br.com.sistema.academico.factory.SwingComponenteFactory;
+import br.com.sistema.academico.model.Professor;
 import br.com.sistema.academico.service.ProfessorService;
 
 public class TelaCadastroProfessor extends TelaCadastroTemplate {
@@ -22,15 +27,46 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
     private JTextField campoEmail;
     private ComponenteFactory factory;
     private final ProfessorService professorService = new ProfessorService();
+    private JTable tabelaProfessores;
+    private DefaultTableModel tabelaModel;
 
     public TelaCadastroProfessor() {
         super("Cadastro de Professor");
+        // Após a construção completa, carregar a tabela
+        carregarProfessoresNaTabela();
     }
 
     @Override
     protected void inicializarComponentes() {
         this.factory = new SwingComponenteFactory();
         super.inicializarComponentes();
+        inicializarTabelaProfessores();
+        // Remover chamada daqui para evitar NullPointerException
+        // carregarProfessoresNaTabela();
+    }
+
+    private void inicializarTabelaProfessores() {
+        String[] colunas = {"Nome", "CPF", "Departamento", "E-mail"};
+        tabelaModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tabelaProfessores = new JTable(tabelaModel);
+    }
+
+    private void carregarProfessoresNaTabela() {
+        tabelaModel.setRowCount(0); // Limpa a tabela
+        List<Professor> professores = professorService.listarProfessores();
+        for (Professor p : professores) {
+            tabelaModel.addRow(new Object[]{
+                p.getNome(),
+                p.getCpf(),
+                p.getDepartamento(),
+                p.getEmail()
+            });
+        }
     }
 
     @Override
@@ -43,6 +79,16 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
 
         inicializarCampos();
         adicionarCamposAoFormulario(painel, gbc);
+
+        // Adiciona a tabela de professores abaixo do formulário
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        JScrollPane scrollPane = new JScrollPane(tabelaProfessores);
+        painel.add(scrollPane, gbc);
 
         return painel;
     }
@@ -94,9 +140,16 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
     }
 
     private JButton criarBotaoSalvar() {
-        JButton btnSalvar = factory.criarBotao("Salvar");
-        btnSalvar.setBackground(new Color(0, 123, 255));
+        JButton btnSalvar = new JButton("Salvar");
+        btnSalvar.setBackground(new Color(13, 110, 253)); // Bootstrap azul
         btnSalvar.setForeground(Color.WHITE);
+        btnSalvar.setFont(btnSalvar.getFont().deriveFont(java.awt.Font.BOLD));
+        btnSalvar.setFocusPainted(false);
+        btnSalvar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(13, 110, 253)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnSalvar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSalvar.addActionListener(e -> salvarProfessor());
         return btnSalvar;
     }
@@ -117,6 +170,7 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
             );
             limparCampos();
             mostrarMensagemSucesso("Professor salvo com sucesso!");
+            carregarProfessoresNaTabela(); // Atualiza a tabela após salvar
         } catch (IllegalArgumentException e) {
             mostrarMensagemErro(e.getMessage());
         } catch (Exception e) {
