@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
 
+import br.com.sistema.academico.builder.AlunoBuilder;
 import br.com.sistema.academico.factory.ComponenteFactory;
 import br.com.sistema.academico.factory.SwingComponenteFactory;
 import br.com.sistema.academico.model.Aluno;
@@ -251,21 +252,22 @@ public class TelaCadastroAluno extends TelaCadastroTemplate {
             return;
         }
         try {
-            Aluno aluno = new Aluno(
-                campoNome.getText(),
-                campoCpf.getText(),
-                campoDataNascimento.getText(),
-                campoGenero.getSelectedItem().toString(),
-                "", // email
-                "", // telefone
-                "", // endereco
-                "", // curso
-                "", // grau
-                "", // turno
-                "", // dataIngresso
-                "", // situacao
-                ""  // periodo
-            );
+            Aluno aluno = new AlunoBuilder()
+                .setNome(campoNome.getText())
+                .setCpf(campoCpf.getText())
+                .setDataNascimento(campoDataNascimento.getText())
+                .setSexo(campoGenero.getSelectedItem().toString())
+                // Os campos abaixo são placeholders, pois não existem no formulário atual
+                .setEmail("")
+                .setTelefone("")
+                .setEndereco("")
+                .setCurso("")
+                .setGrau("")
+                .setTurno("")
+                .setDataIngresso("")
+                .setSituacao("")
+                .setPeriodo("")
+                .build();
             alunoService.salvarAluno(aluno);
             limparCampos();
             mostrarMensagemSucesso("Aluno cadastrado com sucesso!");

@@ -3,7 +3,7 @@ package br.com.sistema.academico.builder;
 import br.com.sistema.academico.model.Aluno;
 
 public class AlunoBuilder {
-    private Aluno aluno = new Aluno();
+    private final Aluno aluno = new Aluno();
 
     public AlunoBuilder setNome(String nome) {
         aluno.setNome(nome);
@@ -20,7 +20,7 @@ public class AlunoBuilder {
         return this;
     }
 
-    public AlunoBuilder setPeriodo(String periodo) {  // ✅ Adicione este método
+    public AlunoBuilder setPeriodo(String periodo) {
         aluno.setPeriodo(periodo);
         return this;
     }
