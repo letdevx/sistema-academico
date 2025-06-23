@@ -28,6 +28,7 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     private JTextField campoAnoSemestre;
     private JComboBox<String> comboDisciplinas;
     private DefaultTableModel tableModel;
+    private JTable tabelaTurmas;
 
     private final TurmaService turmaService = new TurmaService();
     private DisciplinaService disciplinaService;
@@ -117,8 +118,8 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
 
         // Inicializa o tableModel aqui
         tableModel = new DefaultTableModel(new Object[]{"Nome da Turma", "Curso", "Turno", "Ano/Semestre", "Disciplinas"}, 0);
-        JTable table = new JTable(tableModel);
-        JScrollPane tableScroll = new JScrollPane(table);
+        tabelaTurmas = new JTable(tableModel);
+        JScrollPane tableScroll = new JScrollPane(tabelaTurmas);
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
@@ -135,10 +136,57 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
     protected JPanel criarBotoes() {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton btnSalvar = new JButton("Salvar Turma");
+        JButton btnEditar = new JButton("Editar");
+        JButton btnExcluir = new JButton("Excluir");
+
+        // Bootstrap: Azul (Salvar), Amarelo (Editar), Vermelho (Excluir)
+        btnSalvar.setBackground(new java.awt.Color(13, 110, 253)); // Azul
+        btnSalvar.setForeground(java.awt.Color.BLACK); // Label preto
+        btnSalvar.setFont(btnSalvar.getFont().deriveFont(java.awt.Font.BOLD));
+        btnSalvar.setFocusPainted(false);
+        btnSalvar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(13, 110, 253)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnSalvar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSalvar.setOpaque(true);
+        btnSalvar.setContentAreaFilled(true);
+
+        btnEditar.setBackground(new java.awt.Color(255, 193, 7)); // Amarelo
+        btnEditar.setForeground(java.awt.Color.BLACK); // Label preto
+        btnEditar.setFont(btnEditar.getFont().deriveFont(java.awt.Font.BOLD));
+        btnEditar.setFocusPainted(false);
+        btnEditar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 193, 7)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditar.setOpaque(true);
+        btnEditar.setContentAreaFilled(true);
+
+        btnExcluir.setBackground(new java.awt.Color(220, 53, 69)); // Vermelho
+        btnExcluir.setForeground(java.awt.Color.BLACK); // Label preto
+        btnExcluir.setFont(btnExcluir.getFont().deriveFont(java.awt.Font.BOLD));
+        btnExcluir.setFocusPainted(false);
+        btnExcluir.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 53, 69)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnExcluir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExcluir.setOpaque(true);
+        btnExcluir.setContentAreaFilled(true);
+
         btnSalvar.addActionListener(e -> salvarTurma());
+        btnEditar.addActionListener(e -> editarTurma());
+        btnExcluir.addActionListener(e -> excluirTurma());
+
         bottomPanel.add(btnSalvar);
+        bottomPanel.add(btnEditar);
+        bottomPanel.add(btnExcluir);
         return bottomPanel;
     }
+
+    private int turmaEditando = -1;
 
     private void salvarTurma() {
         String nomeTurma = campoNomeTurma.getText().trim();
@@ -149,15 +197,55 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
 
         try {
             turmaService.validarCampos(nomeTurma, curso, turno, anoSemestre, List.of(disciplinaSelecionada));
-            turmaService.salvarTurma(nomeTurma, curso, turno, anoSemestre, List.of(disciplinaSelecionada));
-            tableModel.addRow(new Object[]{nomeTurma, curso, turno, anoSemestre, disciplinaSelecionada});
+            if (turmaEditando >= 0) {
+                // Atualizar turma existente
+                atualizarTurmaArquivo(turmaEditando, nomeTurma, curso, turno, anoSemestre, disciplinaSelecionada);
+                tableModel.setValueAt(nomeTurma, turmaEditando, 0);
+                tableModel.setValueAt(curso, turmaEditando, 1);
+                tableModel.setValueAt(turno, turmaEditando, 2);
+                tableModel.setValueAt(anoSemestre, turmaEditando, 3);
+                tableModel.setValueAt(disciplinaSelecionada, turmaEditando, 4);
+                mostrarMensagemSucesso("Turma editada com sucesso!");
+                turmaEditando = -1;
+            } else {
+                turmaService.salvarTurma(nomeTurma, curso, turno, anoSemestre, List.of(disciplinaSelecionada));
+                tableModel.addRow(new Object[]{nomeTurma, curso, turno, anoSemestre, disciplinaSelecionada});
+                mostrarMensagemSucesso("Turma salva com sucesso!");
+            }
             limparCampos();
-            mostrarMensagemSucesso("Turma salva com sucesso!");
         } catch (IllegalArgumentException e) {
             mostrarMensagemErro(e.getMessage());
         } catch (IOException | RuntimeException e) {
             mostrarMensagemErro("Erro ao salvar turma: " + e.getMessage());
         }
+    }
+
+    private void editarTurma() {
+        int row = getTabelaSelecionada();
+        if (row == -1) {
+            mostrarMensagemErro("Selecione uma turma para editar.");
+            return;
+        }
+        campoNomeTurma.setText((String) tableModel.getValueAt(row, 0));
+        campoCurso.setText((String) tableModel.getValueAt(row, 1));
+        campoTurno.setText((String) tableModel.getValueAt(row, 2));
+        campoAnoSemestre.setText((String) tableModel.getValueAt(row, 3));
+        comboDisciplinas.setSelectedItem(tableModel.getValueAt(row, 4));
+        turmaEditando = row;
+    }
+
+    private void excluirTurma() {
+        int row = getTabelaSelecionada();
+        if (row == -1) {
+            mostrarMensagemErro("Selecione uma turma para excluir.");
+            return;
+        }
+        if (!confirmarAcao("Deseja realmente excluir esta turma?")) return;
+        removerTurmaArquivo(row);
+        tableModel.removeRow(row);
+        limparCampos();
+        mostrarMensagemSucesso("Turma excluída com sucesso!");
+        turmaEditando = -1;
     }
 
     private void carregarTurmas() {
@@ -174,6 +262,32 @@ public class TelaCadastroTurma extends TelaCadastroTemplate {
             }
         } catch (IOException | RuntimeException e) {
             // Ignorar erro de leitura inicial
+        }
+    }
+
+    private int getTabelaSelecionada() {
+        return tabelaTurmas.getSelectedRow();
+    }
+
+    private void atualizarTurmaArquivo(int row, String nome, String curso, String turno, String anoSemestre, String disciplina) throws IOException {
+        java.io.File file = new java.io.File("src/main/resources/data/turmas.txt");
+        List<String> linhas = java.nio.file.Files.readAllLines(file.toPath());
+        if (row >= 0 && row < linhas.size()) {
+            linhas.set(row, nome + ";" + curso + ";" + turno + ";" + anoSemestre + ";" + disciplina);
+            java.nio.file.Files.write(file.toPath(), linhas);
+        }
+    }
+
+    private void removerTurmaArquivo(int row) {
+        try {
+            java.io.File file = new java.io.File("src/main/resources/data/turmas.txt");
+            List<String> linhas = java.nio.file.Files.readAllLines(file.toPath());
+            if (row >= 0 && row < linhas.size()) {
+                linhas.remove(row);
+                java.nio.file.Files.write(file.toPath(), linhas);
+            }
+        } catch (IOException e) {
+            mostrarMensagemErro("Erro ao excluir turma do arquivo: " + e.getMessage());
         }
     }
 

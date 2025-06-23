@@ -54,6 +54,20 @@ public class ProfessorService {
         return professorRepository.findAll();
     }
 
+    /**
+     * Exclui um professor pelo CPF
+     */
+    public void excluirProfessor(String cpf) {
+        professorRepository.findByCpf(cpf).ifPresent(professorRepository::delete);
+    }
+
+    /**
+     * Atualiza os dados de um professor existente
+     */
+    public void atualizarProfessor(Professor professor) {
+        professorRepository.update(professor);
+    }
+
     private boolean validarEmail(String email) {
         return EMAIL_PATTERN.matcher(email).matches();
     }

@@ -42,7 +42,7 @@ public class TelaMatriculaCompleta extends JPanel {
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Matrícula Completa (Turma + Disciplinas)"));
-        formPanel.setBackground(new Color(240, 255, 250));
+        formPanel.setBackground(Color.LIGHT_GRAY); // cinza claro padronizado igual às outras telas
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);

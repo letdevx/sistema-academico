@@ -69,7 +69,7 @@ public class TelaBoletimAluno extends JPanel {
         areaBoletim.setText("");
         Map<String, List<Double>> notasPorDisciplina = new HashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("notas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/data/notas.txt"))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");

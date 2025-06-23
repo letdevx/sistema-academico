@@ -5,19 +5,23 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import br.com.sistema.academico.factory.ComponenteFactory;
 import br.com.sistema.academico.factory.SwingComponenteFactory;
 import br.com.sistema.academico.model.Professor;
+import br.com.sistema.academico.service.DisciplinaService;
 import br.com.sistema.academico.service.ProfessorService;
 
 public class TelaCadastroProfessor extends TelaCadastroTemplate {
@@ -29,9 +33,11 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
     private final ProfessorService professorService = new ProfessorService();
     private JTable tabelaProfessores;
     private DefaultTableModel tabelaModel;
+    private JList<String> listaDisciplinas;
+    private DisciplinaService disciplinaService;
 
     public TelaCadastroProfessor() {
-        super("Cadastro de Professor");
+        super("Cadastro de Professor"); // inicializarComponentes, criarFormulario, criarBotoes
         // Após a construção completa, carregar a tabela
         carregarProfessoresNaTabela();
     }
@@ -79,6 +85,24 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
 
         inicializarCampos();
         adicionarCamposAoFormulario(painel, gbc);
+
+        // Campo de seleção de disciplinas
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        painel.add(factory.criarLabel("Disciplinas:"), gbc);
+        gbc.gridx = 1;
+        try {
+            disciplinaService = new DisciplinaService();
+            List<String> disciplinas = disciplinaService.listarDisciplinas();
+            listaDisciplinas = new JList<>(disciplinas.toArray(new String[0]));
+        } catch (IOException e) {
+            listaDisciplinas = new JList<>(new String[]{"Erro ao carregar disciplinas"});
+        }
+        listaDisciplinas.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        listaDisciplinas.setVisibleRowCount(4);
+        JScrollPane scrollDisciplinas = new JScrollPane(listaDisciplinas);
+        painel.add(scrollDisciplinas, gbc);
 
         // Adiciona a tabela de professores abaixo do formulário
         gbc.gridx = 0;
@@ -131,11 +155,84 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
         painel.add(campoEmail, gbc);
     }
 
+    private void editarProfessor() {
+        int row = tabelaProfessores.getSelectedRow();
+        if (row == -1) {
+            mostrarMensagemErro("Selecione um professor para editar.");
+            return;
+        }
+        // Preenche os campos com os dados selecionados
+        campoNome.setText((String) tabelaModel.getValueAt(row, 0));
+        campoCpf.setText((String) tabelaModel.getValueAt(row, 1));
+        campoDepartamento.setText((String) tabelaModel.getValueAt(row, 2));
+        campoEmail.setText((String) tabelaModel.getValueAt(row, 3));
+        // Seleciona as disciplinas do professor (se houver)
+        Professor prof = professorService.listarProfessores().stream()
+            .filter(p -> p.getCpf().equals(campoCpf.getText()))
+            .findFirst().orElse(null);
+        if (prof != null && prof.getDisciplinas() != null) {
+            int[] indices = prof.getDisciplinas().stream()
+                .mapToInt(disc -> {
+                    for (int i = 0; i < listaDisciplinas.getModel().getSize(); i++) {
+                        if (listaDisciplinas.getModel().getElementAt(i).equals(disc)) return i;
+                    }
+                    return -1;
+                })
+                .filter(i -> i >= 0)
+                .toArray();
+            listaDisciplinas.setSelectedIndices(indices);
+        }
+        // Ao clicar em salvar, atualizará o registro existente
+    }
+
     @Override
     protected JPanel criarBotoes() {
         JPanel painel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnSalvar = criarBotaoSalvar();
+        JButton btnEditar = new JButton("Editar");
+        JButton btnExcluir = new JButton("Excluir");
+
+        btnSalvar.setBackground(new java.awt.Color(13, 110, 253)); // Azul
+        btnSalvar.setForeground(java.awt.Color.BLACK); // Label preto
+        btnSalvar.setFont(btnSalvar.getFont().deriveFont(java.awt.Font.BOLD));
+        btnSalvar.setFocusPainted(false);
+        btnSalvar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(13, 110, 253)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnSalvar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSalvar.setOpaque(true);
+        btnSalvar.setContentAreaFilled(true);
+
+        btnEditar.setBackground(new java.awt.Color(255, 193, 7)); // Amarelo
+        btnEditar.setForeground(java.awt.Color.BLACK); // Label preto
+        btnEditar.setFont(btnEditar.getFont().deriveFont(java.awt.Font.BOLD));
+        btnEditar.setFocusPainted(false);
+        btnEditar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 193, 7)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditar.setOpaque(true);
+        btnEditar.setContentAreaFilled(true);
+        btnEditar.addActionListener(e -> editarProfessor());
+
+        btnExcluir.setBackground(new java.awt.Color(220, 53, 69)); // Vermelho
+        btnExcluir.setForeground(java.awt.Color.BLACK); // Label preto
+        btnExcluir.setFont(btnExcluir.getFont().deriveFont(java.awt.Font.BOLD));
+        btnExcluir.setFocusPainted(false);
+        btnExcluir.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 53, 69)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnExcluir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExcluir.setOpaque(true);
+        btnExcluir.setContentAreaFilled(true);
+        btnExcluir.addActionListener(e -> excluirProfessor());
+
         painel.add(btnSalvar);
+        painel.add(btnEditar);
+        painel.add(btnExcluir);
         return painel;
     }
 
@@ -162,15 +259,34 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
                 campoDepartamento.getText(),
                 campoEmail.getText()
             );
-            professorService.salvarProfessor(
+            List<String> disciplinasSelecionadas = listaDisciplinas.getSelectedValuesList();
+            Professor professor = new Professor(
                 campoNome.getText(),
                 campoCpf.getText(),
                 campoDepartamento.getText(),
-                campoEmail.getText()
+                campoEmail.getText(),
+                disciplinasSelecionadas
             );
+            // Se já existe, atualiza; senão, salva novo
+            if (professorService.listarProfessores().stream().anyMatch(p -> p.getCpf().equals(campoCpf.getText()))) {
+                professor.setId(
+                    professorService.listarProfessores().stream()
+                        .filter(p -> p.getCpf().equals(campoCpf.getText()))
+                        .findFirst().map(Professor::getId).orElse(null)
+                );
+                professorService.atualizarProfessor(professor);
+                mostrarMensagemSucesso("Professor atualizado com sucesso!");
+            } else {
+                professorService.salvarProfessor(
+                    campoNome.getText(),
+                    campoCpf.getText(),
+                    campoDepartamento.getText(),
+                    campoEmail.getText()
+                );
+                mostrarMensagemSucesso("Professor salvo com sucesso!");
+            }
             limparCampos();
-            mostrarMensagemSucesso("Professor salvo com sucesso!");
-            carregarProfessoresNaTabela(); // Atualiza a tabela após salvar
+            carregarProfessoresNaTabela();
         } catch (IllegalArgumentException e) {
             mostrarMensagemErro(e.getMessage());
         } catch (Exception e) {
@@ -178,10 +294,24 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
         }
     }
 
+    private void excluirProfessor() {
+        int row = tabelaProfessores.getSelectedRow();
+        if (row == -1) {
+            mostrarMensagemErro("Selecione um professor para excluir.");
+            return;
+        }
+        String cpf = (String) tabelaModel.getValueAt(row, 1);
+        professorService.excluirProfessor(cpf);
+        carregarProfessoresNaTabela();
+        limparCampos();
+        mostrarMensagemSucesso("Professor excluído com sucesso!");
+    }
+
     private void limparCampos() {
         campoNome.setText("");
         campoCpf.setText("");
         campoDepartamento.setText("");
         campoEmail.setText("");
+        if (listaDisciplinas != null) listaDisciplinas.clearSelection();
     }
 }

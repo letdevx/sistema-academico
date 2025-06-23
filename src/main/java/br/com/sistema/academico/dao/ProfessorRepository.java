@@ -20,13 +20,14 @@ public class ProfessorRepository implements Repository<Professor> {
 
     @Override
     public void save(Professor professor) {
-        String sql = "INSERT INTO professores (nome, cpf, departamento, email) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO professores (nome, cpf, departamento, email, disciplinas) VALUES (?, ?, ?, ?, ?)";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, professor.getNome());
             stmt.setString(2, professor.getCpf());
             stmt.setString(3, professor.getDepartamento());
             stmt.setString(4, professor.getEmail());
+            stmt.setString(5, String.join(",", professor.getDisciplinas()));
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar professor: " + e.getMessage(), e);
@@ -35,14 +36,15 @@ public class ProfessorRepository implements Repository<Professor> {
 
     @Override
     public void update(Professor professor) {
-        String sql = "UPDATE professores SET nome = ?, cpf = ?, departamento = ?, email = ? WHERE id = ?";
+        String sql = "UPDATE professores SET nome = ?, cpf = ?, departamento = ?, email = ?, disciplinas = ? WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, professor.getNome());
             stmt.setString(2, professor.getCpf());
             stmt.setString(3, professor.getDepartamento());
             stmt.setString(4, professor.getEmail());
-            stmt.setLong(5, professor.getId());
+            stmt.setString(5, String.join(",", professor.getDisciplinas()));
+            stmt.setLong(6, professor.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar professor: " + e.getMessage(), e);
@@ -116,8 +118,14 @@ public class ProfessorRepository implements Repository<Professor> {
             rs.getString("nome"),
             rs.getString("cpf"),
             rs.getString("departamento"),
-            rs.getString("email")
+            rs.getString("email"),
+            new ArrayList<>()
         );
+        String disciplinasStr = rs.getString("disciplinas");
+        if (disciplinasStr != null && !disciplinasStr.isEmpty()) {
+            String[] disciplinasArr = disciplinasStr.split(",");
+            professor.setDisciplinas(java.util.Arrays.asList(disciplinasArr));
+        }
         professor.setId(rs.getLong("id"));
         return professor;
     }

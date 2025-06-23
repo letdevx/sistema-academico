@@ -2,6 +2,8 @@ package br.com.sistema.academico.controller;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -25,21 +27,31 @@ public class TelaMatriculaAluno extends JPanel {
 
     private JComboBox<String> comboAlunos;
     private JComboBox<String> comboTurmas;
-    private final DefaultTableModel tableModel;
+    private DefaultTableModel tableModel;
+    private JTable tabelaMatriculas;
+    private int matriculaEditando = -1;
 
     private final MatriculaAlunoService matriculaAlunoService = new MatriculaAlunoService();
     private final AlunoService alunoService = new AlunoService();
 
     public TelaMatriculaAluno() {
         setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
+        setBackground(Color.LIGHT_GRAY); // cinza claro igual às outras telas
+        add(criarFormulario(), BorderLayout.NORTH);
+        add(criarTabela(), BorderLayout.CENTER);
+        add(criarBotoes(), BorderLayout.SOUTH);
+        carregarAlunos();
+        carregarTurmas();
+        carregarMatriculas();
+    }
 
+    private JPanel criarFormulario() {
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Matrícula de Aluno"));
-        formPanel.setBackground(new Color(230, 255, 250));
+        formPanel.setBackground(Color.LIGHT_GRAY); // cinza claro padronizado
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -57,32 +69,72 @@ public class TelaMatriculaAluno extends JPanel {
         comboTurmas = new JComboBox<>();
         formPanel.add(comboTurmas, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        JButton matricular = new JButton("Matricular");
-        matricular.addActionListener(e -> salvarMatricula());
-        formPanel.add(matricular, gbc);
+        return formPanel;
+    }
 
-        gbc.gridx = 1;
-        JButton limpar = new JButton("Limpar");
-        limpar.addActionListener(e -> {
-            comboAlunos.setSelectedIndex(0);
-            comboTurmas.setSelectedIndex(0);
-        });
-        formPanel.add(limpar, gbc);
-
+    private JScrollPane criarTabela() {
         String[] colunas = {"CPF do Aluno", "Turma"};
-        tableModel = new DefaultTableModel(colunas, 0);
-        JTable tabela = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(tabela);
+        tableModel = new DefaultTableModel(colunas, 0) {
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tabelaMatriculas = new JTable(tableModel);
+        tabelaMatriculas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tabelaMatriculas.setRowHeight(28);
+        tabelaMatriculas.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
+        tabelaMatriculas.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        JScrollPane scrollPane = new JScrollPane(tabelaMatriculas);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Alunos Matriculados"));
+        return scrollPane;
+    }
 
-        carregarAlunos();
-        carregarTurmas();
-        carregarMatriculas();
-
-        add(formPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+    private JPanel criarBotoes() {
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton btnSalvar = new JButton("Matricular");
+        JButton btnEditar = new JButton("Editar");
+        JButton btnExcluir = new JButton("Excluir");
+        // Bootstrap Azul
+        btnSalvar.setBackground(new Color(13, 110, 253));
+        btnSalvar.setForeground(Color.BLACK);
+        btnSalvar.setFont(btnSalvar.getFont().deriveFont(Font.BOLD));
+        btnSalvar.setFocusPainted(false);
+        btnSalvar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(13, 110, 253)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnSalvar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSalvar.setOpaque(true);
+        btnSalvar.setContentAreaFilled(true);
+        // Bootstrap Amarelo
+        btnEditar.setBackground(new Color(255, 193, 7));
+        btnEditar.setForeground(Color.BLACK);
+        btnEditar.setFont(btnEditar.getFont().deriveFont(Font.BOLD));
+        btnEditar.setFocusPainted(false);
+        btnEditar.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(255, 193, 7)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditar.setOpaque(true);
+        btnEditar.setContentAreaFilled(true);
+        // Bootstrap Vermelho
+        btnExcluir.setBackground(new Color(220, 53, 69));
+        btnExcluir.setForeground(Color.BLACK);
+        btnExcluir.setFont(btnExcluir.getFont().deriveFont(Font.BOLD));
+        btnExcluir.setFocusPainted(false);
+        btnExcluir.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new Color(220, 53, 69)),
+            javax.swing.BorderFactory.createEmptyBorder(8, 24, 8, 24)
+        ));
+        btnExcluir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExcluir.setOpaque(true);
+        btnExcluir.setContentAreaFilled(true);
+        painelBotoes.add(btnSalvar);
+        painelBotoes.add(btnEditar);
+        painelBotoes.add(btnExcluir);
+        btnSalvar.addActionListener(e -> salvarMatricula());
+        btnEditar.addActionListener(e -> editarMatricula());
+        btnExcluir.addActionListener(e -> excluirMatricula());
+        return painelBotoes;
     }
 
     private void carregarAlunos() {
@@ -113,14 +165,46 @@ public class TelaMatriculaAluno extends JPanel {
         String cpf = aluno.split(" - ")[0];
         try {
             matriculaAlunoService.validarCampos(cpf, turma);
-            matriculaAlunoService.salvarMatricula(cpf, turma);
-            tableModel.addRow(new String[]{cpf, turma});
-            JOptionPane.showMessageDialog(this, "Matrícula realizada com sucesso!");
+            if (matriculaEditando >= 0) {
+                atualizarMatriculaArquivo(matriculaEditando, cpf, turma);
+                tableModel.setValueAt(cpf, matriculaEditando, 0);
+                tableModel.setValueAt(turma, matriculaEditando, 1);
+                JOptionPane.showMessageDialog(this, "Matrícula editada com sucesso!");
+                matriculaEditando = -1;
+            } else {
+                matriculaAlunoService.salvarMatricula(cpf, turma);
+                tableModel.addRow(new String[]{cpf, turma});
+                JOptionPane.showMessageDialog(this, "Matrícula realizada com sucesso!");
+            }
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         } catch (IOException | RuntimeException e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula: " + e.getMessage());
         }
+    }
+
+    private void editarMatricula() {
+        int row = tabelaMatriculas.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione uma matrícula para editar.");
+            return;
+        }
+        comboAlunos.setSelectedItem(tableModel.getValueAt(row, 0));
+        comboTurmas.setSelectedItem(tableModel.getValueAt(row, 1));
+        matriculaEditando = row;
+    }
+
+    private void excluirMatricula() {
+        int row = tabelaMatriculas.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione uma matrícula para excluir.");
+            return;
+        }
+        if (JOptionPane.showConfirmDialog(this, "Deseja realmente excluir esta matrícula?", "Confirmação", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        removerMatriculaArquivo(row);
+        tableModel.removeRow(row);
+        matriculaEditando = -1;
+        JOptionPane.showMessageDialog(this, "Matrícula excluída com sucesso!");
     }
 
     private void carregarMatriculas() {
@@ -134,6 +218,28 @@ public class TelaMatriculaAluno extends JPanel {
             }
         } catch (Exception e) {
             // arquivo ainda não existe ou erro de leitura
+        }
+    }
+
+    private void atualizarMatriculaArquivo(int row, String cpf, String turma) throws IOException {
+        java.io.File file = new java.io.File("src/main/resources/data/matriculas.txt");
+        java.util.List<String> linhas = java.nio.file.Files.readAllLines(file.toPath());
+        if (row >= 0 && row < linhas.size()) {
+            linhas.set(row, cpf + ";" + turma);
+            java.nio.file.Files.write(file.toPath(), linhas);
+        }
+    }
+
+    private void removerMatriculaArquivo(int row) {
+        try {
+            java.io.File file = new java.io.File("src/main/resources/data/matriculas.txt");
+            java.util.List<String> linhas = java.nio.file.Files.readAllLines(file.toPath());
+            if (row >= 0 && row < linhas.size()) {
+                linhas.remove(row);
+                java.nio.file.Files.write(file.toPath(), linhas);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao excluir matrícula do arquivo: " + e.getMessage());
         }
     }
 }
