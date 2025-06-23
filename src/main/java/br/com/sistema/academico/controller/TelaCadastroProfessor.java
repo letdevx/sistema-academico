@@ -94,10 +94,10 @@ public class TelaCadastroProfessor extends TelaCadastroTemplate {
     }
 
     private void inicializarCampos() {
-        campoNome = factory.criarCampoTexto();
-        campoCpf = factory.criarCampoTexto();
-        campoDepartamento = factory.criarCampoTexto();
-        campoEmail = factory.criarCampoTexto();
+        campoNome = factory.criarCampoTexto(false);
+        campoCpf = factory.criarCampoTexto(false);
+        campoDepartamento = factory.criarCampoTexto(false);
+        campoEmail = factory.criarCampoTexto(false);
 
         campoNome.setToolTipText("Digite o nome do professor");
         campoCpf.setToolTipText("Digite o CPF");
